@@ -14,7 +14,7 @@ This module replace the search algorithm of the back office by the TntSearch lib
 Add it in your main thelia composer.json file
 
 ```
-composer require thelia/tnt-search-module:~0.6.0
+composer require thelia/tnt-search-module:~0.6.1
 ```
 
 ## Thelia Loops
