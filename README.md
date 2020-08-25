@@ -1,15 +1,12 @@
 # Tnt Search
 
-This module replace the search algorithm of the back office by the TntSearch library.
+This module replace the search algorithm of the back office and the front-office by the TntSearch library.
 
 ## Installation
 
-### Manually
-
-* Copy the module into ```<thelia_root>/local/modules/``` directory and be sure that the name of the module is TntSearch.
-* Activate it in your thelia administration panel
-
 ### Composer
+
+This module include dependencies needs to be installed by composer
 
 Add it in your main thelia composer.json file
 
@@ -54,3 +51,58 @@ To use this loop you need to combine it with another loop
     {/loop}
 
 The `order="given_id"` is important because TNTSearch return the ids in order of pertinence.
+
+
+# TNT Search
+
+Ce module remplace l'algorithme de recherche du back office et du front-office par la librairie TntSearch.
+
+## Installation
+
+### Composer
+
+Ce module comporte des dépendances et doit être installé via composer
+
+Ajoutez-le dans votre fichier principal thelia composer.json
+
+''
+composer nécessite thelia / tnt-search-module: ~ 0.6.0
+''
+
+## Boucles Thelia
+
+### boucle de recherche tnt
+
+Cette boucle renvoie les identifiants des éléments sélectionnés.
+
+### Arguments d'entrée
+
+| Arguments | Description |
+| --- | --- |
+| *** search_for *** | Une liste des éléments que vous voulez rechercher (`produits`,` catégories`, `dossiers`,` contenus`, `marques`,` commandes` ou `clients`) |
+| *** langs *** | Une liste de langues sur lesquelles vous souhaitez rechercher ex: 'fr_FR, en_US' |
+| *** recherche *** | Le terme de recherche à rechercher |
+
+### Arguments de sortie
+
+| Variable | Description |
+| --- | --- |
+| $ PRODUCTS | Une liste d'ID produits ou 0 |
+| $ CATEGORIES | Une liste d'identifiants de catégorie ou 0 |
+| $ BRANDS | Une liste d'identifiants de marque ou 0 |
+| $ FOLDERS | Une liste d'ID de dossier ou 0 |
+| $ CONTENTS | Une liste d'ID de contenu ou 0 |
+| $ CUSTOMERS | Une liste d'identifiants clients ou 0 |
+| $ ORDERS | Une liste d'ID de commande ou 0 |
+
+### Exemple
+
+Pour utiliser cette boucle, vous devez la combiner avec une autre boucle
+
+    {loop type = "tnt-search" name = "product-tnt-search-loop" search_for = "products" langs = "fr_FR" search = $ search}
+        {loop type = "product" name = "product-loop" id = $ PRODUCTS order = "given_id"}
+            Mettez votre code ici
+        {/boucle}
+    {/boucle}
+
+Le `order =" given_id "` est important car TNTSearch renvoie les identifiants par ordre de pertinence.
