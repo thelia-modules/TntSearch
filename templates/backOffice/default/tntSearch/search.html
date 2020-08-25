@@ -8,8 +8,10 @@
         </ul>
     </div>
 
+    {loop type="tnt-search" name="back-tnt-search-loop" search=$smarty.get.search_term search_for="*"}
+
     {* customer search *}
-    {if $customers}
+    {if $CUSTOMERS}
     <div class="general-block-decorator">
         <div class="table-responsive">
             <table class="table table-striped table-condensed table-left-aligned">
@@ -46,7 +48,7 @@
                     </thead>
 
                     <tbody>
-                    {loop name="customer_list" type="customer" current="false" visible="*" backend_context="1" id=$customers}
+                    {loop name="customer_list" type="customer" current="false" visible="*" backend_context="1" id=$CUSTOMERS}
                     {assign "lastOrderDate" ''}
                     {assign "lastOrderAmount" ''}
                     {assign "lastOrderCurrency" ''}
@@ -142,7 +144,7 @@
 
 
     {* order search *}
-    {if $orders}
+    {if $ORDERS}
     <div class="general-block-decorator">
         <div class="table-responsive">
             <table class="table table-striped table-condensed table-left-aligned">
@@ -169,7 +171,7 @@
                 </thead>
 
                 <tbody>
-                {loop type="order" name="order-search" backend_context=1 customer="*" id=$orders}
+                {loop type="order" name="order-search" backend_context=1 customer="*" id=$ORDERS}
                 {loop type="order_address" name="order-invoice-address" id=$INVOICE_ADDRESS}
                 {assign "orderInvoiceFirstName" $FIRSTNAME}
                 {assign "orderInvoiceLastName" $LASTNAME}
@@ -231,7 +233,7 @@
 
 
     {* category search *}
-    {if $categories}
+    {if $CATEGORIES}
     <div class="general-block-decorator">
         <div class="table-responsive">
             <table class="table table-striped table-condensed table-left-aligned">
@@ -255,7 +257,7 @@
                     </thead>
 
                     <tbody>
-                    {loop type="category" name="category-search" backend_context=1 visible="*" id=$categories}
+                    {loop type="category" name="category-search" backend_context=1 visible="*" id=$CATEGORIES}
 
                     {if $LOOP_COUNT < 26}
                         <tr>
@@ -324,7 +326,7 @@
 
 
     {* product search *}
-    {if $products}
+    {if $PRODUCTS}
     <div class="general-block-decorator">
         <div class="table-responsive">
             <table class="table table-striped table-condensed table-left-aligned">
@@ -349,7 +351,7 @@
                     </thead>
 
                     <tbody>
-                    {loop type="product" name="product-search" backend_context=1 visible="*" id=$products order="given_id"}
+                    {loop type="product" name="product-search" backend_context=1 visible="*" id=$PRODUCTS order="given_id"}
                     {if $LOOP_COUNT < 26}
                         {$id_product=$ID}
                         <tr>
@@ -430,7 +432,7 @@
 
 
     {* folder search *}
-    {if $folders}
+    {if $FOLDERS}
     <div class="general-block-decorator">
         <div class="table-responsive">
             <table class="table table-striped table-condensed table-left-aligned">
@@ -454,7 +456,7 @@
                     </thead>
 
                     <tbody>
-                    {loop type="folder" name="folder-search" backend_context=1 visible="*" id=$folders}
+                    {loop type="folder" name="folder-search" backend_context=1 visible="*" id=$FOLDERS}
                     {if $LOOP_COUNT < 26}
                         <tr>
                             <td>{$ID}</td>
@@ -524,7 +526,7 @@
 
 
     {* content search *}
-    {if $contents}
+    {if $CONTENTS}
     <div class="general-block-decorator">
         <div class="table-responsive">
             <table class="table table-striped table-condensed table-left-aligned">
@@ -548,7 +550,7 @@
                     </thead>
 
                     <tbody>
-                    {loop type="content" name="content-search" backend_context=1 visible="*" id=$contents}
+                    {loop type="content" name="content-search" backend_context=1 visible="*" id=$CONTENTS}
                     {if $LOOP_COUNT < 26}
                         <tr>
                             <td>{$ID}</td>
@@ -614,7 +616,7 @@
 
 
     {* brand search *}
-    {if $brands}
+    {if $BRANDS}
     <div class="general-block-decorator">
         <div class="table-responsive">
             <table class="table table-striped table-condensed table-left-aligned">
@@ -637,7 +639,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {loop type="brand" name="brand_search" visible="*" id=$brands}
+                    {loop type="brand" name="brand_search" visible="*" id=$BRANDS}
                         <tr>
                             <td>{$ID}</td>
                             <td></td>
@@ -687,6 +689,8 @@
     </div>
     {/if}
     {* end brand search *}
+
+    {/loop}
 
 
 

@@ -6,6 +6,7 @@ namespace TntSearch\Controller;
 use ColissimoLabel\Exception\Exception;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Controller\Admin\BaseAdminController;
+use TntSearch\Event\GenerateIndexesEvent;
 use TntSearch\TntSearch;
 
 class TntSearchController extends BaseAdminController
@@ -23,7 +24,10 @@ class TntSearchController extends BaseAdminController
 
         try {
 
-            TntSearch::generateIndexes();
+            $this->dispatch(
+                GenerateIndexesEvent::GENERATE_INDEXES,
+                new GenerateIndexesEvent()
+            );
 
         } catch (\Exception $exception) {
 
