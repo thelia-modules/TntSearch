@@ -42,7 +42,7 @@ class TntSearchLoop extends BaseLoop implements PropelSearchLoopInterface
                 )
             ),
             Argument::createAlphaNumStringTypeArgument('langs'),
-            Argument::createAlphaNumStringTypeArgument('search')
+            Argument::createAnyTypeArgument('search')
         );
     }
 
