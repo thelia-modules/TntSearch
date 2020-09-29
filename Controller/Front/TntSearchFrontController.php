@@ -89,6 +89,7 @@ class TntSearchFrontController extends BaseFrontOpenApiController
         }
 
         $tnt = TntSearch::getTntSearch();
+        $tnt->fuzziness = true;
 
         $modelFactory = $this->getModelFactory();
 

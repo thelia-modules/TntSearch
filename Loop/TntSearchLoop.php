@@ -60,6 +60,7 @@ class TntSearchLoop extends BaseLoop implements PropelSearchLoopInterface
     public function parseResults(LoopResult $loopResult)
     {
         $tnt = TntSearch::getTntSearch();
+        $tnt->fuzziness = true;
 
         $search = $this->getSearch();
 
