@@ -1,6 +1,8 @@
 # Tnt Search
 
-This module replace the search algorithm of the back office by the TntSearch library.
+This module provides TNTSearch feature to Thelia. [TNTSearch](https://github.com/teamtnt/tntsearch) is a full-featured full text search (FTS) engine written entirely in PHP. 
+
+The module could be used in front-office, using the dedicated loop. It also replaces the standard back-office search.
 
 ## Installation
 
