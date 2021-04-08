@@ -10,6 +10,7 @@ namespace TntSearch\Loop;
 
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use TeamTNT\TNTSearch\Exceptions\IndexNotFoundException;
 use Thelia\Action\ProductSaleElement;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -72,51 +73,66 @@ class TntSearchLoop extends BaseLoop implements PropelSearchLoopInterface
 
         $searchFor = $this->getSearchFor();
 
-        $customers = $orders = $products = $categories = $pse = $folders = $contents = $brands = [];
-
-        if (in_array("*", $searchFor, true)){
+        if (in_array("*", $searchFor, true)) {
             $searchFor = ['customers', 'orders', 'products', 'categories', 'folders', 'contents', 'brands', 'pse'];
         }
 
-        if (in_array("customers", $searchFor, true)) {
-            $tnt->selectIndex('customer.index');
-            $customers = $tnt->search($search)['ids'];
-        }
+        do {
+            $error = false;
+            $customers = $orders = $products = $categories = $pse = $folders = $contents = $brands = [];
+            try {
 
-        if (in_array("orders", $searchFor, true)) {
-            $tnt->selectIndex('order.index');
-            $orders = $tnt->search($search)['ids'];
-        }
+                if (in_array("customers", $searchFor, true)) {
+                    $tnt->selectIndex('customer.index');
+                    $customers = $tnt->search($search)['ids'];
+                }
 
-        if (in_array("pse", $searchFor, true)) {
-            $tnt->selectIndex('pse.index');
-            $pse = $tnt->search($search)['ids'];
-        }
+                if (in_array("orders", $searchFor, true)) {
+                    $tnt->selectIndex('order.index');
+                    $orders = $tnt->search($search)['ids'];
+                }
 
-        /** @var Lang $lang */
-        foreach ($langs as $lang) {
+                if (in_array("pse", $searchFor, true)) {
+                    $tnt->selectIndex('pse.index');
+                    $pse = $tnt->search($search)['ids'];
+                }
 
-            if (in_array("products", $searchFor, true)) {
-                $tnt->selectIndex('product_' . $lang->getLocale() . '.index');
-                $products += $tnt->search($search)['ids'];
+                /** @var Lang $lang */
+                foreach ($langs as $lang) {
+
+                    if (in_array("products", $searchFor, true)) {
+                        $tnt->selectIndex('product_' . $lang->getLocale() . '.index');
+                        $products += $tnt->search($search)['ids'];
+                    }
+                    if (in_array("categories", $searchFor, true)) {
+                        $tnt->selectIndex('category_' . $lang->getLocale() . '.index');
+                        $categories += $tnt->search($search)['ids'];
+                    }
+                    if (in_array("folders", $searchFor, true)) {
+                        $tnt->selectIndex('folder_' . $lang->getLocale() . '.index');
+                        $folders += $tnt->search($search)['ids'];
+                    }
+                    if (in_array("contents", $searchFor, true)) {
+                        $tnt->selectIndex('content_' . $lang->getLocale() . '.index');
+                        $contents += $tnt->search($search)['ids'];
+                    }
+                    if (in_array("brands", $searchFor, true)) {
+                        $tnt->selectIndex('brand_' . $lang->getLocale() . '.index');
+                        $brands += $tnt->search($search)['ids'];
+                    }
+                }
+            }catch (IndexNotFoundException $e){
+                $error = true;
+                $indexPath = explode(' ', $e->getMessage())[1];
+                $indexName = array_slice(explode('/', $indexPath), -1)[0];
+                $indexNameArray = preg_split('/(\_|\.)/', $indexName);
+                $locale = null;
+                if (count($indexNameArray)>2){
+                    $locale = $indexNameArray[1] . "_" . $indexNameArray[2];
+                }
+                TntSearch::generateMissingIndex($indexNameArray[0], $locale, $tnt);
             }
-            if (in_array("categories", $searchFor, true)) {
-                $tnt->selectIndex('category_' . $lang->getLocale() . '.index');
-                $categories += $tnt->search($search)['ids'];
-            }
-            if (in_array("folders", $searchFor, true)) {
-                $tnt->selectIndex('folder_' . $lang->getLocale() . '.index');
-                $folders += $tnt->search($search)['ids'];
-            }
-            if (in_array("contents", $searchFor, true)) {
-                $tnt->selectIndex('content_' . $lang->getLocale() . '.index');
-                $contents += $tnt->search($search)['ids'];
-            }
-            if (in_array("brands", $searchFor, true)) {
-                $tnt->selectIndex('brand_' . $lang->getLocale() . '.index');
-                $brands += $tnt->search($search)['ids'];
-            }
-        }
+        }while($error === true);
 
         $loopResultRow = new LoopResultRow();
 

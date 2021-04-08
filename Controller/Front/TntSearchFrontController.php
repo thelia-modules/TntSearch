@@ -12,6 +12,7 @@ use OpenApi\Annotations as OA;
 use OpenApi\Controller\Front\BaseFrontOpenApiController;
 use OpenApi\Exception\OpenApiException;
 use OpenApi\Model\Api\Error;
+use TeamTNT\TNTSearch\Exceptions\IndexNotFoundException;
 use Thelia\Model\Base\BrandQuery;
 use Thelia\Model\Base\CategoryQuery;
 use Thelia\Model\Base\ContentQuery;
@@ -120,17 +121,21 @@ class TntSearchFrontController extends BaseFrontOpenApiController
             }
             $indexName .= '.index';
 
-            try {
-                $tnt->selectIndex($indexName);
-                $resultIds = $tnt->search($term);
+            do {
+                $isNotFound = false;
+                try {                    $tnt->selectIndex($indexName);
+                    $resultIds = $tnt->search($term);
 
-            } catch (\Exception $e) {
-                /** @var Error $error */
-                $error = $modelFactory->buildModel('Error', [
-                    'title' => $e->getMessage()
-                ]);
-                throw new OpenApiException($error, 500);
-            }
+                }catch (IndexNotFoundException $e){
+                    TntSearch::generateMissingIndex($type, $lang->getLocale(), $tnt);
+                } catch (\Exception $e) {
+                    /** @var Error $error */
+                    $error = $modelFactory->buildModel('Error', [
+                        'title' => $e->getMessage()
+                    ]);
+                    throw new OpenApiException($error, 500);
+                }
+            }while($isNotFound === true);
 
             $theliaElement = $modelName = null;
 
