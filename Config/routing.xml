@@ -5,7 +5,11 @@
         xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
 
     <route id="tntsearch.admin.search" path="/admin/search">
-        <default key="_controller">TntSearch\Controller\SearchController::SearchAdminAction</default>
+        <default key="_controller">TntSearch\Controller\SearchController::searchAdminAction</default>
+    </route>
+
+    <route id="tntsearch.front.search" path="/TntSearch/search">
+        <default key="_controller">TntSearch\Controller\Front\TntSearchFrontController::frontSearchAction</default>
     </route>
 
     <route id="tntsearch.generate.indexes" path="/admin/module/TntSearch/generateIndexes">

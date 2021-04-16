@@ -16,7 +16,7 @@ The module could be used in front-office, using the dedicated loop. It also repl
 Add it in your main thelia composer.json file
 
 ```
-composer require thelia/tnt-search-module:~0.6.1
+composer require thelia/tnt-search-module:~0.6.2
 ```
 
 ## Thelia Loops
