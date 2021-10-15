@@ -47,6 +47,7 @@ class GenerateIndexesListener implements EventSubscriberInterface
         $indexer->run();
 
         foreach ($langs as $lang) {
+            $tnt = TntSearch::getTntSearch($lang->getLocale());
 
             $indexer = $tnt->createIndex('product_' . $lang->getLocale() . '.index');
             $indexer->query('SELECT p.id AS id, 
@@ -59,7 +60,7 @@ class GenerateIndexesListener implements EventSubscriberInterface
                                 FROM product AS p 
                                 LEFT JOIN product_i18n AS pi ON p.id = pi.id 
                                 LEFT JOIN product_sale_elements AS pse ON p.id = pse.product_id
-                                WHERE pi.locale=\'' . $lang->getLocale() . '\';');
+                                WHERE pi.locale=\'' . $lang->getLocale() . '\'');
             $indexer->run();
 
             $indexer = $tnt->createIndex('category_' . $lang->getLocale() . '.index');

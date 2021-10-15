@@ -4,38 +4,29 @@
         xsi:schemaLocation="http://thelia.net/schema/dic/module http://thelia.net/schema/dic/module/module-2_2.xsd">
     <fullnamespace>TntSearch\TntSearch</fullnamespace>
     <descriptive locale="en_US">
-        <title>This module implement TntSearch for the BackOffice</title>
-        <!--
-        <subtitle></subtitle>
-        <description></description>
-        <postscriptum></postscriptum>
-        -->
+        <title>TntSearch for front-offcie and back-office</title>
     </descriptive>
     <descriptive locale="fr_FR">
-        <title>Ce module implement TntSearch pour le BackOffice</title>
+        <title>Utiliser TntSearch en front offcie et en back office</title>
     </descriptive>
-    <!-- <logo></logo> -->
-    <!--<images-folder>images</images-folder>-->
     <languages>
         <language>en_US</language>
         <language>fr_FR</language>
     </languages>
-    <version>0.6.1</version>
+    <version>0.7.0</version>
     <authors>
         <author>
             <name>Nicolas Barbey</name>
             <email>nbarbey@openstudio.com</email>
         </author>
+        <author>
+            <name>Franck Allimant</name>
+            <company>OpenStudio</company>
+            <email>fallimant@openstudio.fr</email>
+            <website>www.openstudio.fr</website>
+        </author>
     </authors>
     <type>classic</type>
-    <!--
-    module dependencies
-    <required>
-        <module version="&gt;=0.1">Front</module>
-        <module version="~1.0">HookCart</module>
-        <module version="&gt;0.2">HookSearch</module>
-    </required>
-    -->
     <thelia>2.3.4</thelia>
     <stability>other</stability>
     <mandatory>0</mandatory>

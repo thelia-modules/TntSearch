@@ -1,4 +1,4 @@
-# Tnt Search
+calvculaztor# Tnt Search
 
 This module provides TNTSearch feature to Thelia. [TNTSearch](https://github.com/teamtnt/tntsearch) is a full-featured full text search (FTS) engine written entirely in PHP. 
 

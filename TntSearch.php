@@ -35,7 +35,7 @@ class TntSearch extends BaseModule
         }
     }
 
-    public static function getTntSearch()
+    public static function getTntSearch($locale = null)
     {
         $configFile = THELIA_CONF_DIR . "database.yml";
 
@@ -59,13 +59,33 @@ class TntSearch extends BaseModule
             $fs->mkdir(self::INDEXES_DIR);
         }
 
+        switch ($locale) {
+            case 'fr_FR':
+                $stemmer = \TeamTNT\TNTSearch\Stemmer\FrenchStemmer::class;
+                break;
+            case 'it_IT':
+                $stemmer = \TeamTNT\TNTSearch\Stemmer\ItalianStemmer::class;
+                break;
+            case 'de_DE':
+                $stemmer = \TeamTNT\TNTSearch\Stemmer\GermanStemmer::class;
+                break;
+            case 'pt_PT':
+                $stemmer = \TeamTNT\TNTSearch\Stemmer\PortugueseStemmer::class;
+                break;
+
+            default:
+                $stemmer = \TeamTNT\TNTSearch\Stemmer\PorterStemmer::class;
+        }
+
         $config = [
             'driver' => $driver,
             'host' => $host,
+            'charset' => 'utf8',
             'database' => $database,
             'username' => $user,
             'password' => $password,
             'storage' => self::INDEXES_DIR,
+            'stemmer' => $stemmer
         ];
 
         $tnt = new \TeamTNT\TNTSearch\TNTSearch();

@@ -64,6 +64,7 @@ class TntSearchLoop extends BaseLoop implements PropelSearchLoopInterface
         $search = $this->getSearch();
 
         $langs = LangQuery::create()->filterByActive(1);
+
         if ($this->getLangs()){
             $langs->filterByLocale($this->getLangs());
         }
@@ -94,6 +95,7 @@ class TntSearchLoop extends BaseLoop implements PropelSearchLoopInterface
 
         /** @var Lang $lang */
         foreach ($langs as $lang) {
+            $tnt = TntSearch::getTntSearch($lang->getLocale());
 
             if (in_array("products", $searchFor, true)) {
                 $tnt->selectIndex('product_' . $lang->getLocale() . '.index');
