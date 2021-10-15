@@ -61,7 +61,7 @@ class TntSearch extends BaseModule
 
         switch ($locale) {
             case 'fr_FR':
-                $stemmer = \TeamTNT\TNTSearch\Stemmer\FrenchStemmer::class;
+                $stemmer = \TntSearch\Stemmer\FrenchStemmer::class;
                 break;
             case 'it_IT':
                 $stemmer = \TeamTNT\TNTSearch\Stemmer\ItalianStemmer::class;
