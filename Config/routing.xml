@@ -12,4 +12,7 @@
         <default key="_controller">TntSearch\Controller\TntSearchController::generateIndexesAction</default>
     </route>
 
+    <route id="tntsearch.update.config" path="/admin/module/TntSearch/update-configuration" methods="post">
+        <default key="_controller">TntSearch\Controller\TntSearchController::updateConfigAction</default>
+    </route>
 </routes>

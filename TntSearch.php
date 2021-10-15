@@ -25,8 +25,12 @@ class TntSearch extends BaseModule
 
     const INDEXES_DIR = THELIA_LOCAL_DIR . "TNTIndexes";
 
+    const ON_THE_FLY_UPDATE = 'tntsearch.on_the_fly_update';
+
     public function postActivation(ConnectionInterface $con = null)
     {
+        self::setConfigValue(self::ON_THE_FLY_UPDATE, true);
+
         if (!is_dir($this::INDEXES_DIR)) {
             $this->getDispatcher()->dispatch(
                 GenerateIndexesEvent::GENERATE_INDEXES,
@@ -34,6 +38,14 @@ class TntSearch extends BaseModule
             );
         }
     }
+
+    public function update($currentVersion, $newVersion, ConnectionInterface $con = null)
+    {
+        if (version_compare($currentVersion, '0.7.0') === -1) {
+            self::setConfigValue(self::ON_THE_FLY_UPDATE, true);
+        }
+    }
+
 
     public static function getTntSearch($locale = null)
     {

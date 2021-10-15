@@ -1,38 +1,42 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: nicolasbarbey
- * Date: 27/09/2019
- * Time: 14:35
- */
+/*************************************************************************************/
+/*      Copyright (c) Open Studio                                                    */
+/*      web : https://open.studio                                                    */
+/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE      */
+/*      file that was distributed with this source code.                             */
+/*************************************************************************************/
 
+/**
+ * Created by Franck Allimant, OpenStudio <fallimant@openstudio.fr>
+ * Date: 15/10/2021 19:59
+ */
 namespace TntSearch\EventListeners;
 
-
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Thelia\Core\Event\Brand\BrandCreateEvent;
+use Thelia\Core\Event\Brand\BrandDeleteEvent;
+use Thelia\Core\Event\Brand\BrandUpdateEvent;
 use Thelia\Core\Event\Category\CategoryCreateEvent;
 use Thelia\Core\Event\Category\CategoryDeleteEvent;
 use Thelia\Core\Event\Category\CategoryUpdateEvent;
+use Thelia\Core\Event\Content\ContentCreateEvent;
+use Thelia\Core\Event\Content\ContentDeleteEvent;
+use Thelia\Core\Event\Content\ContentUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerEvent;
+use Thelia\Core\Event\Folder\FolderCreateEvent;
+use Thelia\Core\Event\Folder\FolderDeleteEvent;
 use Thelia\Core\Event\Folder\FolderUpdateEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Product\ProductCreateEvent;
 use Thelia\Core\Event\Product\ProductDeleteEvent;
 use Thelia\Core\Event\Product\ProductUpdateEvent;
-use Thelia\Model\Base\Category;
-use Thelia\Model\Customer;
-use Thelia\Model\Folder;
-use Thelia\Core\Event\Brand\BrandCreateEvent;
-use Thelia\Core\Event\Brand\BrandDeleteEvent;
-use Thelia\Core\Event\Brand\BrandUpdateEvent;
-use Thelia\Core\Event\Content\ContentCreateEvent;
-use Thelia\Core\Event\Content\ContentDeleteEvent;
-use Thelia\Core\Event\Content\ContentUpdateEvent;
-use Thelia\Core\Event\Folder\FolderCreateEvent;
-use Thelia\Core\Event\Folder\FolderDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Model\Base\Category;
 use Thelia\Model\Brand;
 use Thelia\Model\Content;
+use Thelia\Model\Customer;
+use Thelia\Model\Folder;
 use Thelia\Model\LangQuery;
 use Thelia\Model\Order;
 use Thelia\Model\Product;
@@ -42,6 +46,11 @@ class UpdateListener implements EventSubscriberInterface
 {
     public static function getSubscribedEvents()
     {
+        // We don't update indexes if updates on back-office changes is disabled.
+        if (false === (bool) TntSearch::getConfigValue(TntSearch::ON_THE_FLY_UPDATE, true)) {
+            return [];
+        }
+
         return [
             TheliaEvents::CUSTOMER_CREATEACCOUNT => 'createCustomerIndex',
             TheliaEvents::CUSTOMER_UPDATEACCOUNT => 'updateCustomerIndex',
@@ -532,5 +541,4 @@ class UpdateListener implements EventSubscriberInterface
             'postscriptum' => $brand->getPostscriptum()
         ];
     }
-
 }

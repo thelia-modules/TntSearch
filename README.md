@@ -1,4 +1,4 @@
-calvculaztor# Tnt Search
+# Tnt Search
 
 This module provides TNTSearch feature to Thelia. [TNTSearch](https://github.com/teamtnt/tntsearch) is a full-featured full text search (FTS) engine written entirely in PHP. 
 
@@ -18,6 +18,19 @@ Add it in your main thelia composer.json file
 ```
 composer require thelia/tnt-search-module:~0.6.1
 ```
+
+## Configuration
+
+The search indexes will be updated each time a product, category, folder, content,
+brand, ... is updated in the back-office. This could take some time, depending on your configuration.
+You can disable this reali-time udate in the module configuration, to speed up 
+back-office changes.
+
+
+In this case, you have to rebuild the indexes manually, using the `Rebuild Indexes` button in
+the module configuiration page, or automatically using a cron which trigger the index 
+build from time to time with this Thelia command: `Thelia tntsearch:indexes`
+
 
 ## Thelia Loops
 

@@ -4,10 +4,10 @@
         xsi:schemaLocation="http://thelia.net/schema/dic/module http://thelia.net/schema/dic/module/module-2_2.xsd">
     <fullnamespace>TntSearch\TntSearch</fullnamespace>
     <descriptive locale="en_US">
-        <title>TntSearch for front-offcie and back-office</title>
+        <title>TntSearch search engine for front-office and back-office</title>
     </descriptive>
     <descriptive locale="fr_FR">
-        <title>Utiliser TntSearch en front offcie et en back office</title>
+        <title>Utiliser TntSearch en front-office et en back-office</title>
     </descriptive>
     <languages>
         <language>en_US</language>
