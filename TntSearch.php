@@ -17,6 +17,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Yaml;
 use Thelia\Module\BaseModule;
 use TntSearch\Event\GenerateIndexesEvent;
+use TntSearch\Search\TntSearchExt;
 
 class TntSearch extends BaseModule
 {
@@ -100,9 +101,6 @@ class TntSearch extends BaseModule
             'stemmer' => $stemmer
         ];
 
-        $tnt = new \TeamTNT\TNTSearch\TNTSearch();
-        $tnt->loadConfig($config);
-
-        return $tnt;
+        return new TntSearchExt($config);
     }
 }

@@ -25,6 +25,11 @@ use Thelia\Type\EnumListType;
 use Thelia\Type\TypeCollection;
 use TntSearch\TntSearch;
 
+/**
+ * @method string getSearch()
+ * @method array getSearchFor()
+ * @method string getLangs()
+ */
 class TntSearchLoop extends BaseLoop implements PropelSearchLoopInterface
 {
     protected function getArgDefinitions()
@@ -42,7 +47,8 @@ class TntSearchLoop extends BaseLoop implements PropelSearchLoopInterface
                 )
             ),
             Argument::createAlphaNumStringTypeArgument('langs'),
-            Argument::createAnyTypeArgument('search')
+            Argument::createAnyTypeArgument('search'),
+            Argument::createIntTypeArgument('limit', 100)
         );
     }
 
@@ -50,7 +56,6 @@ class TntSearchLoop extends BaseLoop implements PropelSearchLoopInterface
     {
         return null;
     }
-
 
     /**
      * @param LoopResult $loopResult
@@ -68,29 +73,30 @@ class TntSearchLoop extends BaseLoop implements PropelSearchLoopInterface
         if ($this->getLangs()){
             $langs->filterByLocale($this->getLangs());
         }
+
         $langs = $langs->find();
 
         $searchFor = $this->getSearchFor();
 
         $customers = $orders = $products = $categories = $pse = $folders = $contents = $brands = [];
 
+        $offset = (int) $this->getOffset();
+        $limit = (int) $this->getLimit();
+
         if (in_array("*", $searchFor, true)){
             $searchFor = ['customers', 'orders', 'products', 'categories', 'folders', 'contents', 'brands', 'pse'];
         }
 
         if (in_array("customers", $searchFor, true)) {
-            $tnt->selectIndex('customer.index');
-            $customers = $tnt->search($search)['ids'];
+            $customers = $tnt->searchAndPaginate($search, 'customer.index', $offset, $limit);
         }
 
         if (in_array("orders", $searchFor, true)) {
-            $tnt->selectIndex('order.index');
-            $orders = $tnt->search($search)['ids'];
+            $orders = $tnt->searchAndPaginate($search, 'order.index', $offset, $limit);
         }
 
         if (in_array("pse", $searchFor, true)) {
-            $tnt->selectIndex('pse.index');
-            $pse = $tnt->search($search)['ids'];
+            $pse = $tnt->searchAndPaginate($search, 'pse.index', $offset, $limit);
         }
 
         /** @var Lang $lang */
@@ -98,24 +104,19 @@ class TntSearchLoop extends BaseLoop implements PropelSearchLoopInterface
             $tnt = TntSearch::getTntSearch($lang->getLocale());
 
             if (in_array("products", $searchFor, true)) {
-                $tnt->selectIndex('product_' . $lang->getLocale() . '.index');
-                $products += $tnt->search($search)['ids'];
+                $products += $tnt->searchAndPaginate($search, 'product_' . $lang->getLocale() . '.index', $offset, $limit);
             }
             if (in_array("categories", $searchFor, true)) {
-                $tnt->selectIndex('category_' . $lang->getLocale() . '.index');
-                $categories += $tnt->search($search)['ids'];
+                $categories += $tnt->searchAndPaginate($search, 'category_' . $lang->getLocale() . '.index', $offset, $limit);
             }
             if (in_array("folders", $searchFor, true)) {
-                $tnt->selectIndex('folder_' . $lang->getLocale() . '.index');
-                $folders += $tnt->search($search)['ids'];
+                $folders += $tnt->searchAndPaginate($search, 'folder_' . $lang->getLocale() . '.index', $offset, $limit);
             }
             if (in_array("contents", $searchFor, true)) {
-                $tnt->selectIndex('content_' . $lang->getLocale() . '.index');
-                $contents += $tnt->search($search)['ids'];
+                $contents += $tnt->searchAndPaginate($search, 'content_' . $lang->getLocale() . '.index', $offset, $limit);
             }
             if (in_array("brands", $searchFor, true)) {
-                $tnt->selectIndex('brand_' . $lang->getLocale() . '.index');
-                $brands += $tnt->search($search)['ids'];
+                $brands += $tnt->searchAndPaginate($search, 'brand_' . $lang->getLocale() . '.index', $offset, $limit);
             }
         }
 
@@ -130,10 +131,9 @@ class TntSearchLoop extends BaseLoop implements PropelSearchLoopInterface
             ->set("CONTENTS", $contents ? implode(',', array_unique($contents)) : 0)
             ->set("CUSTOMERS", $customers ? implode(',', $customers) : 0)
             ->set("ORDERS", $orders ? implode(',', $orders) : 0);
+
         $loopResult->addRow($loopResultRow);
 
         return $loopResult;
-
     }
-
 }
