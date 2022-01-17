@@ -27,7 +27,6 @@ use Thelia\Core\Event\Customer\CustomerEvent;
 use Thelia\Core\Event\Folder\FolderCreateEvent;
 use Thelia\Core\Event\Folder\FolderDeleteEvent;
 use Thelia\Core\Event\Folder\FolderUpdateEvent;
-use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Product\ProductCreateEvent;
 use Thelia\Core\Event\Product\ProductDeleteEvent;
 use Thelia\Core\Event\Product\ProductUpdateEvent;
@@ -36,6 +35,7 @@ use Thelia\Model\Base\Category;
 use Thelia\Model\Brand;
 use Thelia\Model\Content;
 use Thelia\Model\Customer;
+use Thelia\Model\Event\OrderEvent;
 use Thelia\Model\Folder;
 use Thelia\Model\LangQuery;
 use Thelia\Model\Order;
@@ -56,7 +56,7 @@ class UpdateListener implements EventSubscriberInterface
             TheliaEvents::CUSTOMER_UPDATEACCOUNT => 'updateCustomerIndex',
             TheliaEvents::CUSTOMER_DELETEACCOUNT => 'deleteCustomerIndex',
 
-            \Thelia\Model\Event\OrderEvent::POST_INSERT => 'createOrderIndex',
+            OrderEvent::POST_INSERT => 'createOrderIndex',
 
             TheliaEvents::PRODUCT_CREATE => 'createProductIndex',
             TheliaEvents::PRODUCT_UPDATE => 'updateProductIndex',
@@ -137,7 +137,7 @@ class UpdateListener implements EventSubscriberInterface
      */
     public function createOrderIndex(OrderEvent $event)
     {
-        $order = $event->getOrder();
+        $order = $event->getModel();
 
         $tnt = TntSearch::getTntSearch();
         $tnt->selectIndex("order.index");
