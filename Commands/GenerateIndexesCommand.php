@@ -33,9 +33,8 @@ class GenerateIndexesCommand extends ContainerAwareCommand
             $fs->remove(TntSearch::INDEXES_DIR);
         }
 
-        $this->getDispatcher()->dispatch(
-            GenerateIndexesEvent::GENERATE_INDEXES,
-            new GenerateIndexesEvent()
+        $this->getDispatcher()->dispatch(new GenerateIndexesEvent(),
+            GenerateIndexesEvent::GENERATE_INDEXES
         );
     }
 

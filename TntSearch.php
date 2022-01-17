@@ -1,18 +1,26 @@
 <?php
-/*************************************************************************************/
-/*      This file is part of the Thelia package.                                     */
-/*                                                                                   */
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 /*      Copyright (c) OpenStudio                                                     */
 /*      email : dev@thelia.net                                                       */
 /*      web : http://www.thelia.net                                                  */
-/*                                                                                   */
+
 /*      For the full copyright and license information, please view the LICENSE.txt  */
 /*      file that was distributed with this source code.                             */
-/*************************************************************************************/
 
 namespace TntSearch;
 
 use Propel\Runtime\Connection\ConnectionInterface;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ServicesConfigurator;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Yaml;
 use Thelia\Module\BaseModule;
@@ -24,33 +32,31 @@ class TntSearch extends BaseModule
     /** @var string */
     const DOMAIN_NAME = 'tntsearch';
 
-    const INDEXES_DIR = THELIA_LOCAL_DIR . "TNTIndexes";
+    const INDEXES_DIR = THELIA_LOCAL_DIR.'TNTIndexes';
 
     const ON_THE_FLY_UPDATE = 'tntsearch.on_the_fly_update';
 
-    public function postActivation(ConnectionInterface $con = null)
+    public function postActivation(ConnectionInterface $con = null): void
     {
         self::setConfigValue(self::ON_THE_FLY_UPDATE, true);
 
         if (!is_dir($this::INDEXES_DIR)) {
             $this->getDispatcher()->dispatch(
-                GenerateIndexesEvent::GENERATE_INDEXES,
-                new GenerateIndexesEvent()
+                new GenerateIndexesEvent(), GenerateIndexesEvent::GENERATE_INDEXES
             );
         }
     }
 
-    public function update($currentVersion, $newVersion, ConnectionInterface $con = null)
+    public function update($currentVersion, $newVersion, ConnectionInterface $con = null): void
     {
         if (version_compare($currentVersion, '0.7.0') === -1) {
             self::setConfigValue(self::ON_THE_FLY_UPDATE, true);
         }
     }
 
-
     public static function getTntSearch($locale = null)
     {
-        $configFile = THELIA_CONF_DIR . "database.yml";
+        $configFile = THELIA_CONF_DIR.'database.yml';
 
         $propelParameters = Yaml::parse(file_get_contents($configFile))['database']['connection'];
 
@@ -98,9 +104,17 @@ class TntSearch extends BaseModule
             'username' => $user,
             'password' => $password,
             'storage' => self::INDEXES_DIR,
-            'stemmer' => $stemmer
+            'stemmer' => $stemmer,
         ];
 
         return new TntSearchExt($config);
+    }
+
+    public static function configureServices(ServicesConfigurator $servicesConfigurator): void
+    {
+        $servicesConfigurator->load(self::getModuleCode().'\\', __DIR__)
+            ->exclude([THELIA_MODULE_DIR . ucfirst(self::getModuleCode()). "/I18n/*"])
+            ->autowire(true)
+            ->autoconfigure(true);
     }
 }

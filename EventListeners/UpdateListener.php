@@ -56,7 +56,7 @@ class UpdateListener implements EventSubscriberInterface
             TheliaEvents::CUSTOMER_UPDATEACCOUNT => 'updateCustomerIndex',
             TheliaEvents::CUSTOMER_DELETEACCOUNT => 'deleteCustomerIndex',
 
-            TheliaEvents::ORDER_AFTER_CREATE => 'createOrderIndex',
+            \Thelia\Model\Event\OrderEvent::POST_INSERT => 'createOrderIndex',
 
             TheliaEvents::PRODUCT_CREATE => 'createProductIndex',
             TheliaEvents::PRODUCT_UPDATE => 'updateProductIndex',
