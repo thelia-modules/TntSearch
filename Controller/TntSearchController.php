@@ -2,7 +2,9 @@
 
 namespace TntSearch\Controller;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\Request;
 use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Tools\URL;
 use TntSearch\Event\GenerateIndexesEvent;
@@ -10,16 +12,16 @@ use TntSearch\TntSearch;
 
 class TntSearchController extends BaseAdminController
 {
-    public function updateConfigAction()
+    public function updateConfigAction(Request $request)
     {
-        $onTheFlyUpdate = (bool) $this->getRequest()->get('on-the-fly-update', false);
+        $onTheFlyUpdate = (bool) $request->get('on-the-fly-update', false);
 
         TntSearch::setConfigValue(TntSearch::ON_THE_FLY_UPDATE, $onTheFlyUpdate);
 
         return $this->generateRedirect(URL::getInstance()->absoluteUrl("/admin/module/TntSearch"));
     }
 
-    public function generateIndexesAction()
+    public function generateIndexesAction(EventDispatcherInterface $dispatcher)
     {
         $fs = new Filesystem();
 
@@ -30,9 +32,9 @@ class TntSearchController extends BaseAdminController
         ini_set('max_execution_time', 3600);
 
         try {
-            $this->dispatch(
-                GenerateIndexesEvent::GENERATE_INDEXES,
-                new GenerateIndexesEvent()
+            $dispatcher->dispatch(
+                new GenerateIndexesEvent(),
+                GenerateIndexesEvent::GENERATE_INDEXES
             );
 
         } catch (\Exception $exception) {
