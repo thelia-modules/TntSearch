@@ -1,62 +1,77 @@
 <?php
 
-/*
- * This file is part of the Thelia package.
- * http://www.thelia.net
- *
- * (c) OpenStudio <info@thelia.net>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
-/*      Copyright (c) OpenStudio                                                     */
-/*      email : dev@thelia.net                                                       */
-/*      web : http://www.thelia.net                                                  */
-
-/*      For the full copyright and license information, please view the LICENSE.txt  */
-/*      file that was distributed with this source code.                             */
-
 namespace TntSearch;
 
 use Propel\Runtime\Connection\ConnectionInterface;
-use Symfony\Component\DependencyInjection\Loader\Configurator\ServicesConfigurator;
+use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
+use Thelia\Install\Database;
 use Thelia\Module\BaseModule;
-use TntSearch\Event\GenerateIndexesEvent;
-use TntSearch\Search\TntSearchExt;
+use TntSearch\Event\IndexesEvent;
+use TntSearch\Model\TntSearchIndexQuery;
+use TntSearch\Service\TheliaTntSearch;
 
 class TntSearch extends BaseModule
 {
     /** @var string */
     const DOMAIN_NAME = 'tntsearch';
 
-    const INDEXES_DIR = THELIA_LOCAL_DIR.'TNTIndexes';
+    const INDEXES_DIR = THELIA_LOCAL_DIR . "TNTIndexes";
 
     const ON_THE_FLY_UPDATE = 'tntsearch.on_the_fly_update';
 
-    public function postActivation(ConnectionInterface $con = null): void
+    public function postActivation(ConnectionInterface $con = null)
     {
+        try {
+            TntSearchIndexQuery::create()->findOne();
+        } catch (PropelException $ex) {
+            $database = new Database($con->getWrappedConnection());
+            $database->insertSql(null, array(__DIR__ . "/Config/thelia.sql"));
+            $database->insertSql(null, array(__DIR__ . "/Config/data.sql"));
+        }
         self::setConfigValue(self::ON_THE_FLY_UPDATE, true);
-
+        /*
         if (!is_dir($this::INDEXES_DIR)) {
             $this->getDispatcher()->dispatch(
-                new GenerateIndexesEvent(), GenerateIndexesEvent::GENERATE_INDEXES
+                IndexesEvent::GENERATE_INDEXES,
+                new IndexesEvent()
             );
-        }
+        }*/
     }
 
-    public function update($currentVersion, $newVersion, ConnectionInterface $con = null): void
+    public function update($currentVersion, $newVersion, ConnectionInterface $con = null)
     {
         if (version_compare($currentVersion, '0.7.0') === -1) {
             self::setConfigValue(self::ON_THE_FLY_UPDATE, true);
         }
     }
 
+    /**
+     * @param string $locale
+     * @return array|mixed
+     */
+    public static function getStopWords(string $locale = null)
+    {
+        if ($locale == null) {
+            return [];
+        }
+
+        if(is_file($file = __DIR__ . '/StopWords/'.$locale.'.json')){
+            return json_decode(file_get_contents($file));
+        }
+
+        return [];
+    }
+
+    /**
+     * @param $locale
+     * @return \TntSearch\Service\TheliaTntSearch
+     */
     public static function getTntSearch($locale = null)
     {
-        $configFile = THELIA_CONF_DIR.'database.yml';
+        $configFile = THELIA_CONF_DIR . "database.yml";
 
         $propelParameters = Yaml::parse(file_get_contents($configFile))['database']['connection'];
 
@@ -105,16 +120,12 @@ class TntSearch extends BaseModule
             'password' => $password,
             'storage' => self::INDEXES_DIR,
             'stemmer' => $stemmer,
+            'modes' => ''
         ];
 
-        return new TntSearchExt($config);
-    }
+        $myTntSearch = new TheliaTntSearch($config);
+        $myTntSearch->setStopWords(self::getStopWords($locale));
 
-    public static function configureServices(ServicesConfigurator $servicesConfigurator): void
-    {
-        $servicesConfigurator->load(self::getModuleCode().'\\', __DIR__)
-            ->exclude([THELIA_MODULE_DIR . ucfirst(self::getModuleCode()). "/I18n/*"])
-            ->autowire(true)
-            ->autoconfigure(true);
+        return $myTntSearch;
     }
 }

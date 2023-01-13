@@ -1,0 +1,163 @@
+{extends file="admin-layout.tpl"}
+
+{block name="no-return-functions"}
+{$admin_current_location = 'modules'}
+{/block}
+
+{block name="page-title"}{intl d="tntsearch.bo.default" l='Tnt Search configuration'}{/block}
+
+
+{block name="main-content"}
+
+{if $smarty.get.error}
+<div class="alert alert-danger">
+    {intl l="error :" d='tntsearch.bo.default'} {$smarty.get.error}
+</div>
+{/if}
+
+{if $smarty.get.success}
+<div class="alert alert-success">
+    {intl l="The indexes are up to date !" d='tntsearch.bo.default'}
+</div>
+{/if}
+
+
+<div class="general-block-decorator">
+    <form method="post" action="{url path="
+    /admin/module/TntSearch/update-configuration"}">
+    <div class="alert alert-info">
+        <p>{intl l='If this box is checked, the search indexes will be updated each time a product, category, folder,
+            content, brand, ... is updated. This could take some time, depending on your configuration.'
+            d='tntsearch.bo.default'}</p>
+        <p>{intl l='When the box is unchecked, you have to rebuild the indexes manually (see button below) or
+            automatically using a cron which trigger the index build: <code>Thelia tntsearch:indexes</code>'
+            d='tntsearch.bo.default'}</p>
+    </div>
+    <div class="form-group">
+        <label>
+            <input type="checkbox" name="on-the-fly-update" value="1" {if $on_the_fly_update}checked{/if}> {intl
+            l='Update indexes in real time' d='tntsearch.bo.default'}
+        </label>
+    </div>
+    <button type="submit" class="btn btn-primary">{intl l="Update"}</button>
+    </form>
+</div>
+
+<div class="general-block-decorator">
+    <div class="alert alert-info">
+        <p>{intl l='Click the button below to immediately generate search indexes. It may take some time...'
+            d='tntsearch.bo.default'}</p>
+    </div>
+
+    <a href="{url path='/admin/module/TntSearch/generateIndexes'}" class="btn btn-danger">{intl l='Generate indexes'
+        d='tntsearch.bo.default'}</a>
+</div>
+
+<div class="general-block-decorator">
+    <table class="table table-responsive table-hover">
+        <a type="button" href="#index_creation_dialog" class="btn btn-primary btn-responsive action-btn" data-toggle="modal">
+            <span class="glyphicon glyphicon-plus"></span>
+            {intl l="Create index" d="tntsearch.bo.default"}
+        </a>
+        <thead>
+        <tr>
+            <th>{intl l='ID'}</th>
+            <th>{intl l='Index'}</th>
+            <th>{intl l='Translatable'}</th>
+            <th>{intl l='Active'}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {foreach from=$tnt_search_index_list item=tnt_search_index}
+        <tr>
+            <td>{$tnt_search_index.Id}</td>
+            <td>{$tnt_search_index.Index}</td>
+            <td>
+                <div class="make-switch switch-small mySwitch" data-on="success" data-off="danger"
+                     data-on-label="<i class='glyphicon glyphicon-ok'></i>"
+                     data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                    <input name="checkbox_translatable" id="{$tnt_search_index.Id}" type="checkbox"
+                           class="disabled mySwitch" {if {$tnt_search_index.IsTranslatable}== 1}checked="checked" {/if}>
+                </div>
+            </td>
+            <a>
+                <td>
+                    <div class="make-switch switch-small mySwitch" data-on="success" data-off="danger"
+                         data-on-label="<i class='glyphicon glyphicon-ok'></i>"
+                         data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                        <input type="checkbox" name="checkbox_active" id="{$tnt_search_index.Id}"
+                               class="disabled mySwitch" {if {$tnt_search_index.IsActive}== 1}checked="checked" {/if}>
+                    </div>
+                </td>
+            </a>
+        </tr>
+        {/foreach}
+        </tbody>
+    </table>
+</div>
+
+
+    {form name="tnt-search-index-create"}
+
+
+
+
+        {capture "index_creation_dialog"}
+
+        {form_field field="Index"}
+        <input type="checkbox" name="{$name}"><input>
+        {/form_field}
+
+        {form_hidden_fields}
+
+        {form_field field="Active"}
+            <input type="checkbox" name="{$name}">
+        {/form_field}
+
+        {form_field field="Translatable"}
+            <input type="checkbox" name="{$name}"> {$label}
+        {/form_field}
+
+
+
+        {/capture}
+
+    {include
+    file = "includes/generic-create-dialog.html"
+
+    dialog_id    = "index_creation_dialog"
+    dialog_title = {intl l="Create a new index"}
+
+    dialog_ok_label     = {intl l="Create this index"}
+
+    form_action        = {url path='#'}
+    form_enctype       = {form_enctype}
+    form_error_message = $form_error_message
+    }
+    {/form}
+{/block}
+
+
+{block name="javascript-last-call"}
+{javascripts file='assets/js/bootstrap-switch/bootstrap-switch.js'}
+<script src="{$asset_url}"></script>
+{/javascripts}
+
+<script>
+    $(".mySwitch").on('switch-change', function (event, data) {
+        console.log(data.value)
+        console.log(data.el[0].id)
+        console.log(data.el[0].name)
+        $.ajax({
+            url: '{url path="/admin/module/TntSearch/save"}',
+            data: {
+                id: data.el[0].id,
+                check: data.value,
+                name: data.el[0].name,
+            },
+            type: 'post',
+        })
+    });
+</script>
+
+{/block}

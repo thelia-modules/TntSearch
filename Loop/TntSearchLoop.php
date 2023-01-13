@@ -1,34 +1,23 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: nicolasbarbey
- * Date: 29/07/2020
- * Time: 13:35
- */
 
 namespace TntSearch\Loop;
 
-
-use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Thelia\Action\ProductSaleElement;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
-use Thelia\Model\Base\ProductQuery;
-use Thelia\Model\Base\ProductSaleElementsQuery;
-use Thelia\Model\Lang;
-use Thelia\Model\LangQuery;
 use Thelia\Type\EnumListType;
 use Thelia\Type\TypeCollection;
+use TntSearch\Service\TheliaTntSearch;
 use TntSearch\TntSearch;
 
 /**
  * @method string getSearch()
  * @method array getSearchFor()
- * @method string getLangs()
+ * @method string getLocale()
+ * @method string getBackendContext()
  */
 class TntSearchLoop extends BaseLoop implements PropelSearchLoopInterface
 {
@@ -40,13 +29,14 @@ class TntSearchLoop extends BaseLoop implements PropelSearchLoopInterface
                 new TypeCollection(
                     new EnumListType(
                         array(
-                            'products', 'categories', 'brands', 'pse',
-                            'folders', 'contents', 'orders', 'customers', '*'
+                            'product', 'category', 'brand',
+                            'folder', 'content', 'order', 'customer', '*'
                         )
                     )
                 )
             ),
-            Argument::createAlphaNumStringTypeArgument('langs'),
+            Argument::createAlphaNumStringTypeArgument('locale'),
+            Argument::createBooleanTypeArgument('backend_context'),
             Argument::createAnyTypeArgument('search'),
             Argument::createIntTypeArgument('limit', 100)
         );
@@ -64,76 +54,67 @@ class TntSearchLoop extends BaseLoop implements PropelSearchLoopInterface
      */
     public function parseResults(LoopResult $loopResult)
     {
-        $tnt = TntSearch::getTntSearch();
+        $request = $this->getCurrentRequest();
+        $session = $request->getSession();
 
-        $search = $this->getSearch();
-
-        $langs = LangQuery::create()->filterByActive(1);
-
-        if ($this->getLangs()){
-            $langs->filterByLocale($this->getLangs());
-        }
-
-        $langs = $langs->find();
-
-        $searchFor = $this->getSearchFor();
-
-        $customers = $orders = $products = $categories = $pse = $folders = $contents = $brands = [];
-
-        $offset = (int) $this->getOffset();
-        $limit = (int) $this->getLimit();
-
-        if (in_array("*", $searchFor, true)){
-            $searchFor = ['customers', 'orders', 'products', 'categories', 'folders', 'contents', 'brands', 'pse'];
-        }
-
-        if (in_array("customers", $searchFor, true)) {
-            $customers = $tnt->searchAndPaginate($search, 'customer.index', $offset, $limit);
-        }
-
-        if (in_array("orders", $searchFor, true)) {
-            $orders = $tnt->searchAndPaginate($search, 'order.index', $offset, $limit);
-        }
-
-        if (in_array("pse", $searchFor, true)) {
-            $pse = $tnt->searchAndPaginate($search, 'pse.index', $offset, $limit);
-        }
-
-        /** @var Lang $lang */
-        foreach ($langs as $lang) {
-            $tnt = TntSearch::getTntSearch($lang->getLocale());
-
-            if (in_array("products", $searchFor, true)) {
-                $products += $tnt->searchAndPaginate($search, 'product_' . $lang->getLocale() . '.index', $offset, $limit);
+        if (!$locale = $this->getLocale()) {
+            $locale = $session->getLang()->getLocale();
+            if ($this->getBackendContext()) {
+                $locale = $session->getAdminEditionLang()->getLocale();
             }
-            if (in_array("categories", $searchFor, true)) {
-                $categories += $tnt->searchAndPaginate($search, 'category_' . $lang->getLocale() . '.index', $offset, $limit);
-            }
-            if (in_array("folders", $searchFor, true)) {
-                $folders += $tnt->searchAndPaginate($search, 'folder_' . $lang->getLocale() . '.index', $offset, $limit);
-            }
-            if (in_array("contents", $searchFor, true)) {
-                $contents += $tnt->searchAndPaginate($search, 'content_' . $lang->getLocale() . '.index', $offset, $limit);
-            }
-            if (in_array("brands", $searchFor, true)) {
-                $brands += $tnt->searchAndPaginate($search, 'brand_' . $lang->getLocale() . '.index', $offset, $limit);
+        }
+
+        $tnt = TntSearch::getTntSearch($locale);
+
+        $searchWords = $tnt->sanitizeSearchWords($this->getSearch());
+
+        $searchFors = $this->getSearchFor();
+
+        $customer = $order = $product = $category = $pse = $folder = $content = $brand = [];
+
+        $offset = (int)$this->getOffset();
+        $limit = (int)$this->getLimit();
+
+        if (in_array("*", $searchFors, true)) {
+            $searchFors = ['customer', 'order', 'product', 'category', 'folder', 'content', 'brand'];
+        }
+
+        foreach ($searchFors as $searchType) {
+            try {
+                if (in_array($searchType, ["customer", "order"])) {
+                    $$searchType = $this->handleSearch($tnt, $searchWords, $searchType, $offset, $limit);
+                    continue;
+                }
+
+                $$searchType += $this->handleSearch($tnt, $searchWords, $searchType, $offset, $limit, $locale);
+
+            } catch (\Exception $exception) {
+                //TODO: HANDLE ERROR
             }
         }
 
         $loopResultRow = new LoopResultRow();
 
         $loopResultRow
-            ->set("PRODUCTS", $products ? implode(',', array_unique($products)) : 0)
-            ->set("CATEGORIES", $categories ? implode(',', array_unique($categories)) : 0)
-            ->set("BRANDS", $brands ? implode(',', array_unique($brands)) : 0)
-            ->set("PSE", $pse ? implode(',', array_unique($pse)) : 0)
-            ->set("FOLDER", $folders ? implode(',', array_unique($folders)) : 0)
-            ->set("CONTENTS", $contents ? implode(',', array_unique($contents)) : 0)
-            ->set("CUSTOMERS", $customers ? implode(',', $customers) : 0)
-            ->set("ORDERS", $orders ? implode(',', $orders) : 0);
+            ->set("PRODUCTS", $product ? implode(',', $product) : 0)
+            ->set("PRODUCTS_COUNT", $product ? count($product) : 0)
+            ->set("CATEGORIES", $category ? implode(',', $category) : 0)
+            ->set("BRANDS", $brand ? implode(',', $brand) : 0)
+            ->set("PSE", $pse ? implode(',', $pse) : 0)
+            ->set("FOLDER", $folder ? implode(',', $folder) : 0)
+            ->set("CONTENTS", $content ? implode(',', $content) : 0)
+            ->set("CUSTOMERS", $customer ? implode(',', $customer) : 0)
+            ->set("ORDERS", $order ? implode(',', $order) : 0);
 
         $loopResult->addRow($loopResultRow);
 
         return $loopResult;
+    }
+
+    protected function handleSearch(TheliaTntSearch $tnt, $searchWords, $searchType, $offset, $limit, $locale = null)
+    {
+        $index = $locale ? $searchType . '_' . $locale . '.index' : $searchType . '.index';
+
+        return $tnt->searchAndPaginate($searchWords, $index, $offset, $limit);
     }
 }

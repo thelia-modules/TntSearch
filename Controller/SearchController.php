@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: nicolasbarbey
- * Date: 26/09/2019
- * Time: 16:20
- */
 
 namespace TntSearch\Controller;
 

@@ -8,14 +8,23 @@
         <loop name="tnt-search" class="TntSearch\Loop\TntSearchLoop" />
     </loops>
 
-    <hooks>
-        <hook id="tntsearch.hook" class="TntSearch\Hook\BackHook">
-            <tag name="hook.event_listener" event="module.configuration" type="back" method="onModuleConfiguration"/>
-        </hook>
-    </hooks>
+    <services>
+        <service id="tntsearch.update.listener" class="TntSearch\EventListeners\UpdateListener">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="tntsearch.indexation.service" class="TntSearch\Service\IndexationService">
+            <argument type="service" id="event_dispatcher" />
+        </service>
+    </services>
+
 
     <commands>
         <command class="TntSearch\Commands\GenerateIndexesCommand"/>
     </commands>
+
+    <forms>
+        <form name="tnt-search-index-create" class="TntSearch\Form\TntSearchIndexCreateForm"/>
+    </forms>
 
 </config>
