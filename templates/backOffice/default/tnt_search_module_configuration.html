@@ -145,9 +145,6 @@
 
 <script>
     $(".mySwitch").on('switch-change', function (event, data) {
-        console.log(data.value)
-        console.log(data.el[0].id)
-        console.log(data.el[0].name)
         $.ajax({
             url: '{url path="/admin/module/TntSearch/save"}',
             data: {
