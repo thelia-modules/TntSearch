@@ -18,13 +18,14 @@
         </service>
     </services>
 
+    <hooks>
+        <hook id="tntsearch.hook" class="TntSearch\Hook\BackHook">
+            <tag name="hook.event_listener" event="module.configuration" type="back" method="onModuleConfiguration"/>
+        </hook>
+    </hooks>
 
     <commands>
         <command class="TntSearch\Commands\GenerateIndexesCommand"/>
     </commands>
-
-    <forms>
-        <form name="tnt-search-index-create" class="TntSearch\Form\TntSearchIndexCreateForm"/>
-    </forms>
 
 </config>

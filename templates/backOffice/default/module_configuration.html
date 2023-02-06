@@ -1,0 +1,37 @@
+{if $smarty.get.error}
+    <div class="alert alert-danger">
+        {intl l="error :" d='tntsearch.bo.default'} {$smarty.get.error}
+    </div>
+{/if}
+
+{if $smarty.get.success}
+    <div class="alert alert-success">
+        {intl l="The indexes are up to date !" d='tntsearch.bo.default'}
+    </div>
+{/if}
+
+
+<div class="general-block-decorator">
+    <form method="post" action="{url path="/admin/module/TntSearch/update-configuration"}">
+        <div class="alert alert-info">
+            <p>{intl l='If this box is checked, the search indexes will be updated each time a product, category, folder, content, brand, ... is updated. This could take some time, depending on your configuration.' d='tntsearch.bo.default'}</p>
+            <p>{intl l='When the box is unchecked, you have to rebuild the indexes manually (see button below) or automatically using a cron which trigger the index build: <code>Thelia tntsearch:indexes</code>' d='tntsearch.bo.default'}</p>
+        </div>
+        <div class="form-group">
+            <label>
+                <input type="checkbox" name="on-the-fly-update" value="1" {if $on_the_fly_update}checked{/if}> {intl l='Update indexes in real time' d='tntsearch.bo.default'}
+            </label>
+        </div>
+
+        <button type="submit" class="btn btn-primary">{intl l="Update"}</button>
+    </form>
+</div>
+
+<div class="general-block-decorator">
+    <div class="alert alert-info">
+        <p>{intl l='Click the button below to immediately generate search indexes. It may take some time...' d='tntsearch.bo.default'}</p>
+    </div>
+
+    <a href="{url path='/admin/module/TntSearch/generateIndexes'}" class="btn btn-danger">{intl l='Generate indexes' d='tntsearch.bo.default'}</a>
+</div>
+

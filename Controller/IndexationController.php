@@ -3,11 +3,9 @@
 namespace TntSearch\Controller;
 
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Tools\URL;
-use TntSearch\Model\TntSearchIndexQuery;
 use TntSearch\Service\IndexationService;
 use TntSearch\TntSearch;
 
@@ -48,27 +46,5 @@ class IndexationController extends BaseAdminController
         }
 
         return $this->generateRedirect(URL::getInstance()->absoluteUrl("/admin/module/TntSearch", ['success' => true]));
-    }
-
-
-    public function saveConfigAction()
-    {
-        $idTntSearchIndex = $this->getRequest()->get('id');
-        $checkboxBoolVal = $this->getRequest()->get('check');
-        $checkBoxName = $this->getRequest()->get('name');
-
-
-        $TntSearchIndex = TntSearchIndexQuery::create()->filterById($idTntSearchIndex)->findOne();
-
-        if ($checkBoxName === "checkbox_translatable") {
-            $TntSearchIndex->setIsTranslatable($checkboxBoolVal);
-        }
-
-        if ($checkBoxName === "checkbox_active"){
-            $TntSearchIndex->setIsActive($checkboxBoolVal);
-        }
-        $TntSearchIndex->save();
-
-        return $this->generateRedirect(URL::getInstance()->absoluteUrl("/admin/module/TntSearch"));
     }
 }

@@ -3,42 +3,51 @@
 namespace TntSearch;
 
 use Propel\Runtime\Connection\ConnectionInterface;
-use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
-use Thelia\Install\Database;
 use Thelia\Module\BaseModule;
-use TntSearch\Event\IndexesEvent;
-use TntSearch\Model\TntSearchIndexQuery;
 use TntSearch\Service\TheliaTntSearch;
 
 class TntSearch extends BaseModule
 {
     /** @var string */
     const DOMAIN_NAME = 'tntsearch';
-
+    /** @var string */
     const INDEXES_DIR = THELIA_LOCAL_DIR . "TNTIndexes";
-
+    /** @var string */
     const ON_THE_FLY_UPDATE = 'tntsearch.on_the_fly_update';
+
+    //WIP
+    /** @var array[] */
+    public const THELIA_INDEXES = [
+        'customer' => [
+            'is_translatable' => false,
+            'tokenizer' => \TntSearch\Tokenizer\CustomerTokenizer::class
+        ],
+        'order' => [
+            'is_translatable' => false,
+            'tokenizer' => \TntSearch\Tokenizer\CustomerTokenizer::class
+        ],
+        'brand' => [
+            'is_translatable' => true
+        ],
+        'content' => [
+            'is_translatable' => true
+        ],
+        'category' => [
+            'is_translatable' => true
+        ],
+        'folder' => [
+            'is_translatable' => true
+        ],
+        'product' => [
+            'is_translatable' => true
+        ]
+    ];
 
     public function postActivation(ConnectionInterface $con = null)
     {
-        try {
-            TntSearchIndexQuery::create()->findOne();
-        } catch (PropelException $ex) {
-            $database = new Database($con->getWrappedConnection());
-            $database->insertSql(null, array(__DIR__ . "/Config/thelia.sql"));
-            $database->insertSql(null, array(__DIR__ . "/Config/data.sql"));
-        }
-        self::setConfigValue(self::ON_THE_FLY_UPDATE, true);
-        /*
-        if (!is_dir($this::INDEXES_DIR)) {
-            $this->getDispatcher()->dispatch(
-                IndexesEvent::GENERATE_INDEXES,
-                new IndexesEvent()
-            );
-        }*/
+        self::setConfigValue(self::ON_THE_FLY_UPDATE, false);
     }
 
     public function update($currentVersion, $newVersion, ConnectionInterface $con = null)
@@ -58,7 +67,7 @@ class TntSearch extends BaseModule
             return [];
         }
 
-        if(is_file($file = __DIR__ . '/StopWords/'.$locale.'.json')){
+        if (is_file($file = __DIR__ . '/StopWords/' . $locale . '.json')) {
             return json_decode(file_get_contents($file));
         }
 
@@ -69,7 +78,7 @@ class TntSearch extends BaseModule
      * @param $locale
      * @return \TntSearch\Service\TheliaTntSearch
      */
-    public static function getTntSearch($locale = null)
+    public static function getTntSearch($locale = null, $tokenizer = null)
     {
         $configFile = THELIA_CONF_DIR . "database.yml";
 
@@ -120,8 +129,12 @@ class TntSearch extends BaseModule
             'password' => $password,
             'storage' => self::INDEXES_DIR,
             'stemmer' => $stemmer,
-            'modes' => ''
+            'modes' => ['']
         ];
+
+        if ($tokenizer) {
+            $config['tokenizer'] = $tokenizer;
+        }
 
         $myTntSearch = new TheliaTntSearch($config);
         $myTntSearch->setStopWords(self::getStopWords($locale));

@@ -8,19 +8,11 @@
         <default key="_controller">TntSearch\Controller\SearchController::SearchAdminAction</default>
     </route>
 
-    <route id="tntsearch.configuration" path="/admin/module/TntSearch">
-        <default key="_controller">TntSearch\Controller\ConfigurationController::viewAction</default>
-    </route>
-
     <route id="tntsearch.generate.indexes" path="/admin/module/TntSearch/generateIndexes">
         <default key="_controller">TntSearch\Controller\IndexationController::generateIndexesAction</default>
     </route>
 
     <route id="tntsearch.update.config" path="/admin/module/TntSearch/update-configuration" methods="post">
         <default key="_controller">TntSearch\Controller\IndexationController::updateConfigAction</default>
-    </route>
-
-    <route id="tntsearch.save.config" path="/admin/module/TntSearch/save" methods="post">
-        <default key="_controller">TntSearch\Controller\IndexationController::saveConfigAction</default>
     </route>
 </routes>

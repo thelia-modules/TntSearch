@@ -6,14 +6,12 @@ use Composer\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Model\Base\LangQuery;
 use TntSearch\Event\IndexesEvent;
-use TntSearch\Model\TntSearchIndexQuery;
-use TntSearch\TntSearch;
+use TntSearch\TntSearch as TntSearchModule;
 
 class IndexationService
 {
     /** @var EventDispatcher */
     private $dispatcher;
-
 
     public function __construct(EventDispatcherInterface $disptacher)
     {
@@ -27,30 +25,17 @@ class IndexationService
     {
         $langs = LangQuery::create()->filterByActive(1)->find();
 
-        $theliaIndexesData = TntSearchIndexQuery::create()->find()->toArray();
-
-        $theliaIndexes=array_map(
-            function($v) {
-                return
-                    [
-                        'name' => $v["Index"],
-                        'is_translatable' => $v["IsTranslatable"]
-                    ];
-            },
-            $theliaIndexesData
-        );
-
-
-        foreach ($theliaIndexes as $index) {
-            if ($index['is_translatable']) {
-                foreach ($langs as $lang) {
-                    $tnt = TntSearch::getTntSearch($lang->getLocale());
-                    $this->index($index['name'], $tnt, $lang->getLocale());
-                }
+        foreach (TntSearchModule::THELIA_INDEXES as $name => $index) {
+            if (!$index['is_translatable']) {
+                $tnt = TntSearchModule::getTntSearch(null, $index['tokenizer'] ?? null);
+                $this->index($name, $tnt);
                 continue;
             }
-            $tnt = TntSearch::getTntSearch();
-            $this->index($index['name'], $tnt);
+
+            foreach ($langs as $lang) {
+                $tnt = TntSearchModule::getTntSearch($lang->getLocale(), $index['tokenizer'] ?? null);
+                $this->index($name, $tnt, $lang->getLocale());
+            }
         }
     }
 
@@ -73,7 +58,7 @@ class IndexationService
 
     protected function getIndexEvent(string $indexName): IndexesEvent
     {
-        $eventName = 'TntSearch\\Event\\'.ucwords($indexName) . 'IndexationEvent';
+        $eventName = 'TntSearch\\Event\\' . ucwords($indexName) . 'IndexationEvent';
         return new $eventName();
     }
 }

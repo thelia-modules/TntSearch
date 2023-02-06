@@ -8,6 +8,17 @@ class CustomerIndexationEvent extends IndexesEvent
 
     public function buildSqlQuery(): void
     {
-        $this->sqlQuery = 'SELECT id, ref, firstname, lastname, email FROM customer;';
+        $this->sqlQuery = '
+            SELECT customer.id, 
+            customer.ref, 
+            customer.firstname,                    
+            customer.lastname, 
+            customer.email, 
+            CONCAT(address.address1, address.address2, address.address3),            
+            address.zipcode, 
+            address.city  
+            FROM customer
+            JOIN address ON address.customer_id=customer.id;
+        ';
     }
 }

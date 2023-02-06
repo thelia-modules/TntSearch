@@ -79,6 +79,15 @@ class TheliaTntSearch extends TNTSearch
     }
 
     /**
+     * @param $text
+     * @return array
+     */
+    public function breakIntoTokens($text)
+    {
+        return $this->tokenizer->tokenize($text, $this->stopWords);
+    }
+
+    /**
      * @param $searchWords
      * @return string
      */

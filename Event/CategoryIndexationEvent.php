@@ -16,7 +16,7 @@ class CategoryIndexationEvent extends IndexesEvent
             ci.chapo AS chapo,
             ci.description AS description,
             ci.postscriptum AS postscriptum
-            FROM content AS c LEFT JOIN content_i18n AS ci ON c.id = ci.id
+            FROM category AS c LEFT JOIN category_i18n AS ci ON c.id = ci.id
             WHERE ci.locale=\'' . $locale . '\';
         ';
     }

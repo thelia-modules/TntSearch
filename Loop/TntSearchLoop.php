@@ -64,13 +64,7 @@ class TntSearchLoop extends BaseLoop implements PropelSearchLoopInterface
             }
         }
 
-        $tnt = TntSearch::getTntSearch($locale);
-
-        $searchWords = $tnt->sanitizeSearchWords($this->getSearch());
-
         $searchFors = $this->getSearchFor();
-
-        $customer = $order = $product = $category = $pse = $folder = $content = $brand = [];
 
         $offset = (int)$this->getOffset();
         $limit = (int)$this->getLimit();
@@ -79,32 +73,37 @@ class TntSearchLoop extends BaseLoop implements PropelSearchLoopInterface
             $searchFors = ['customer', 'order', 'product', 'category', 'folder', 'content', 'brand'];
         }
 
+        $loopResultRow = new LoopResultRow();
+        $results = [];
+
         foreach ($searchFors as $searchType) {
             try {
-                if (in_array($searchType, ["customer", "order"])) {
-                    $$searchType = $this->handleSearch($tnt, $searchWords, $searchType, $offset, $limit);
-                    continue;
+                $idexes = TntSearch::THELIA_INDEXES;
+                $currentIndexMetaData = $idexes[$searchType] ?? null;
+
+                $tnt = TntSearch::getTntSearch($locale, $currentIndexMetaData);
+
+                $currentLocale = null;
+                if (!in_array($searchType, ["customer", "order"])) {
+                    $currentLocale = $locale;
                 }
 
-                $$searchType += $this->handleSearch($tnt, $searchWords, $searchType, $offset, $limit, $locale);
+                $results[$searchType] = $this->handleSearch($tnt, $this->getSearch(), $searchType, $offset, $limit, $currentLocale);
 
             } catch (\Exception $exception) {
-                //TODO: HANDLE ERROR
+                $error = $exception->getMessage();
             }
         }
 
-        $loopResultRow = new LoopResultRow();
+        $loopResultRow->set("PRODUCTS_COUNT", 0);
+        if (isset($results['product']) && is_array($results['product'])) {
+            $loopResultRow->set("PRODUCTS_COUNT", count($results['product']));
+        }
 
-        $loopResultRow
-            ->set("PRODUCTS", $product ? implode(',', $product) : 0)
-            ->set("PRODUCTS_COUNT", $product ? count($product) : 0)
-            ->set("CATEGORIES", $category ? implode(',', $category) : 0)
-            ->set("BRANDS", $brand ? implode(',', $brand) : 0)
-            ->set("PSE", $pse ? implode(',', $pse) : 0)
-            ->set("FOLDER", $folder ? implode(',', $folder) : 0)
-            ->set("CONTENTS", $content ? implode(',', $content) : 0)
-            ->set("CUSTOMERS", $customer ? implode(',', $customer) : 0)
-            ->set("ORDERS", $order ? implode(',', $order) : 0);
+        foreach ($results as $searchType => $result) {
+            $loopResultRow
+                ->set(strtoupper($searchType), $result ? implode(',', $result) : 0);
+        }
 
         $loopResult->addRow($loopResultRow);
 
