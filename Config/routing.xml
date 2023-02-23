@@ -9,10 +9,10 @@
     </route>
 
     <route id="tntsearch.generate.indexes" path="/admin/module/TntSearch/generateIndexes">
-        <default key="_controller">TntSearch\Controller\TntSearchController::generateIndexesAction</default>
+        <default key="_controller">TntSearch\Controller\IndexationController::generateIndexesAction</default>
     </route>
 
     <route id="tntsearch.update.config" path="/admin/module/TntSearch/update-configuration" methods="post">
-        <default key="_controller">TntSearch\Controller\TntSearchController::updateConfigAction</default>
+        <default key="_controller">TntSearch\Controller\IndexationController::updateConfigAction</default>
     </route>
 </routes>
