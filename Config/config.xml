@@ -4,18 +4,19 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
 
-    <loops>
-        <loop name="tnt-search" class="TntSearch\Loop\TntSearchLoop" />
-    </loops>
+    <services>
+        <service id="tntsearch.base.index" abstract="true">
+            <argument type="service" id="tntsearch.provider"/>
+        </service>
+
+        <!-- needed to be used in loop...   -->
+        <service id="tntsearch.search" alias="TntSearch\Service\Search" public="true" />
+        <service id="tntsearch.indexation.provider" alias="TntSearch\Service\Provider\IndexationProvider" public="true" />
+    </services>
 
     <hooks>
         <hook id="tntsearch.hook" class="TntSearch\Hook\BackHook">
-            <tag name="hook.event_listener" event="module.configuration" type="back" method="onModuleConfiguration"/>
+            <tag name="hook.event_listener" event="module.configuration" type="back" method="onModuleConfig"/>
         </hook>
     </hooks>
-
-    <commands>
-        <command class="TntSearch\Commands\GenerateIndexesCommand"/>
-    </commands>
-
 </config>

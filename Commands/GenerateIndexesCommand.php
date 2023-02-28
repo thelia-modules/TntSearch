@@ -1,23 +1,22 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: nicolasbarbey
- * Date: 03/08/2020
- * Time: 09:55
- */
 
 namespace TntSearch\Commands;
 
-
+use Exception;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Command\ContainerAwareCommand;
-use TntSearch\Event\GenerateIndexesEvent;
+use TntSearch\Service\Provider\IndexationProvider;
 use TntSearch\TntSearch;
 
 class GenerateIndexesCommand extends ContainerAwareCommand
 {
+    public function __construct(protected IndexationProvider $indexationProvider)
+    {
+        parent::__construct();
+    }
+
     public function configure()
     {
         $this
@@ -25,17 +24,23 @@ class GenerateIndexesCommand extends ContainerAwareCommand
             ->setDescription('Generate indexes for TntSearch module');
     }
 
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
-
         $fs = new Filesystem();
+
         if (is_dir(TntSearch::INDEXES_DIR)) {
             $fs->remove(TntSearch::INDEXES_DIR);
         }
 
-        $this->getDispatcher()->dispatch(new GenerateIndexesEvent(),
-            GenerateIndexesEvent::GENERATE_INDEXES
-        );
-    }
+        ini_set('max_execution_time', 3600);
 
+        try {
+            $this->indexationProvider->indexAll();
+
+        } catch (Exception $exception) {
+            $output->write($exception->getMessage());
+        }
+
+        return 1;
+    }
 }
