@@ -4,4 +4,28 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
 
+    <route id="tntsearch.admin.search" path="/admin/search">
+        <default key="_controller">TntSearch\Controller\ConfigurationController::configure</default>
+    </route>
+
+    <route id="tntsearch.generate.indexes" path="/admin/module/TntSearch/generate-indexes">
+        <default key="_controller">TntSearch\Controller\IndexationController::generateIndexesAction</default>
+    </route>
+
+    <route id="tntsearch.update.config" path="/admin/module/TntSearch/configuration" methods="post">
+        <default key="_controller">TntSearch\Controller\ConfigurationController::configuration</default>
+    </route>
+
+    <route id="tntsearch.admin.search" path="/admin/search">
+        <default key="_controller">TntSearch\Controller\SearchController::searchAdminAction</default>
+    </route>
+
+    <!-- Front -->
+    <route id="front_search" path="/search">
+        <default key="_controller">TntSearch\Controller\Front\SearchController::search</default>
+    </route>
+
+    <route id="indexes_search" path="/open_api/tnt-search">
+        <default key="_controller">TntSearch\Controller\Front\SearchOpenApiController::apiSearch</default>
+    </route>
 </routes>

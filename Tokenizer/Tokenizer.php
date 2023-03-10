@@ -4,6 +4,9 @@ namespace TntSearch\Tokenizer;
 use TeamTNT\TNTSearch\Support\AbstractTokenizer;
 use TeamTNT\TNTSearch\Support\TokenizerInterface;
 
+/**
+ * @method getPattern()
+ */
 class Tokenizer extends AbstractTokenizer implements TokenizerInterface
 {
     static protected $pattern = '/[^\p{L}\p{N}\p{Pc}\p{Pd}@]+/u';

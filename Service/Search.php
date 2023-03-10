@@ -2,21 +2,25 @@
 
 namespace TntSearch\Service;
 
+use Couchbase\IndexNotFoundException;
 use Exception;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Propel\Runtime\Map\TableMap;
-use TeamTNT\TNTSearch\Exceptions\IndexNotFoundException;
 use Thelia\Log\Tlog;
 use TntSearch\Service\Provider\IndexationProvider;
 use TntSearch\Service\Provider\TntSearchProvider;
 
 class Search
 {
-    public function __construct(
-        protected IndexationProvider $indexationProvider,
-        protected TntSearchProvider  $tntSearchProvider
-    )
+    /** @var IndexationProvider */
+    private $indexationProvider;
+
+    /** @var TntSearchProvider */
+    private $tntSearchProvider;
+
+    public function __construct( IndexationProvider $indexationProvider, TntSearchProvider  $tntSearchProvider )
     {
+        $this->indexationProvider = $indexationProvider;
+        $this->tntSearchProvider = $tntSearchProvider;
     }
 
     /**

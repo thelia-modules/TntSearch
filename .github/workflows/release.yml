@@ -4,4 +4,4 @@ on:
     branches: [ master, main ]
 jobs:
   release:
-    uses: thelia-modules/ReusableWorkflow/.github/workflows/auto_release.yml@main 
+    uses: thelia-modules/ReusableWorkflow/.github/workflows/auto_release.yml@master

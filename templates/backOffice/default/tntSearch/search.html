@@ -19,13 +19,13 @@
     </div>
 
     {loop type="search_loop" name="back-tnt-search-loop" search=$searchTerm backend_context=1}
-        {$PRODUCTS_IDS = $PRODUCT|default:null}
-        {$CUSTOMERS_IDS = $CUSTOMER|default:null}
-        {$BRAND_IDS = $BRAND|default:null}
-        {$ORDER_IDS = $ORDER|default:null}
-        {$CATEGORY_IDS=$CATEGORY|default:null}
-        {$FOLDER_IDS=$FOLDER|default:null}
-        {$CONTENT_IDS=$CONTENT|default:null}
+        {$PRODUCTS_IDS = $PRODUCT}
+        {$CUSTOMERS_IDS = $CUSTOMER}
+        {$BRAND_IDS = $BRAND}
+        {$ORDER_IDS = $ORDER}
+        {$CATEGORY_IDS=$CATEGORY}
+        {$FOLDER_IDS=$FOLDER}
+        {$CONTENT_IDS=$CONTENT}
     {/loop}
 
         {* customer search *}
@@ -84,7 +84,7 @@
                                 <td><a href="{url path='/admin/customer/update' customer_id=$ID}">{$REF}</a></td>
 
                                 <td>
-                                    {$COMPANY|default:null}
+                                    {$COMPANY}
                                 </td>
 
                                 <td class="object-title">
@@ -96,11 +96,11 @@
                                 {hook name="customers.row" location="customer_list_row" customer_id={$ID}}
 
                                 <td>
-                                    {$lastOrderDate|default:null}
+                                    {$lastOrderDate}
                                 </td>
 
                                 <td>
-                                    {$lastOrderCurrency|default:null} {$lastOrderAmount|default:null}
+                                    {$lastOrderCurrency} {$lastOrderAmount}
                                 </td>
 
                                 <td class="actions">
@@ -835,16 +835,16 @@ form_content        = {$smarty.capture.content_delete_dialog nofilter}
     {/capture}
 
     {include
-    file = "includes/generic-confirm-dialog.html"
+        file = "includes/generic-confirm-dialog.html"
 
-    dialog_id       = "delete_customer_dialog"
-    dialog_title    = {intl l="Delete customer"}
-    dialog_message  = {intl l="Do you really want to delete this customer ?"}
+        dialog_id       = "delete_customer_dialog"
+        dialog_title    = {intl l="Delete customer"}
+        dialog_message  = {intl l="Do you really want to delete this customer ?"}
 
-form_action         = {token_url path='/admin/customer/delete'}
-form_content        = {$smarty.capture.customer_delete_dialog nofilter}
-form_id             = "customer_delete_dialog"
-}
+        form_action         = {token_url path='/admin/customer/delete'}
+        form_content        = {$smarty.capture.customer_delete_dialog nofilter}
+        form_id             = "customer_delete_dialog"
+    }
 
 
     {* -- Delete brand confirmation dialog ----------------------------------- *}

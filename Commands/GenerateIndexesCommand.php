@@ -12,12 +12,16 @@ use TntSearch\TntSearch;
 
 class GenerateIndexesCommand extends ContainerAwareCommand
 {
-    public function __construct(protected IndexationProvider $indexationProvider)
+    /** @var IndexationProvider $indexationProvider */
+    private $indexationProvider;
+
+    public function __construct()
     {
         parent::__construct();
+        $this->indexationProvider = $this->getContainer()->get('tntsearch.indexation.provider');
     }
 
-    public function configure()
+    public function configure() : void
     {
         $this
             ->setName('tntsearch:indexes')

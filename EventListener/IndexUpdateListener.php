@@ -18,10 +18,12 @@ use TntSearch\TntSearch;
 
 class IndexUpdateListener implements EventSubscriberInterface
 {
-    public function __construct(
-        protected ItemIndexation $itemIndexation
-    )
+    /** @var ItemIndexation */
+    protected $itemIndexation;
+
+    public function __construct(ItemIndexation $itemIndexation)
     {
+        $this->itemIndexation = $itemIndexation;
     }
 
     public static function getSubscribedEvents(): array

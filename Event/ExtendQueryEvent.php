@@ -6,11 +6,16 @@ use Thelia\Core\Event\ActionEvent;
 
 class ExtendQueryEvent extends ActionEvent
 {
-    const EXTEND_QUERY = 'action.tntsearch.extend.query.';
+    public const EXTEND_QUERY = 'action.tntsearch.extend.query.';
 
-    protected string $itemType;
-    protected ?int $itemId;
-    protected string $query;
+    /** @var string $itemType */
+    protected $itemType;
+
+    /** @var int|null $itemId */
+    protected $itemId;
+
+    /** @var string $query */
+    protected $query;
 
     /**
      * @return string

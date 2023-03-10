@@ -13,11 +13,12 @@ use TeamTNT\TNTSearch\TNTSearch as BaseTNTSearch;
  * ex : Stop words can be use to clean search words too
  *
  * Override create and get index to handle Propel instance
+ * @method selectIndex($getIndexFileName)
  */
 class TntSearch extends BaseTNTSearch
 {
     /** @var array */
-    protected array $stopWords = [];
+    protected $stopWords = [];
 
     public function __construct(array $config)
     {

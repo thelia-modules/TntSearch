@@ -4,14 +4,76 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
 
+    <commands>
+        <command class="TntSearch\Commands\GenerateIndexesCommand"/>
+    </commands>
+
+    <loops>
+        <loop name="search_loop" class="TntSearch\Loop\SearchLoop"/>
+    </loops>
+
     <services>
-        <service id="tntsearch.base.index" abstract="true">
+        <!--Listeners -->
+        <service id="tntsearch.indexation.update" class="TntSearch\EventListener\IndexUpdateListener">
+            <argument type="service" id="tntsearch.update.index"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <!--Provider-->
+        <service id="tntsearch.provider" class="TntSearch\Service\Provider\TntSearchProvider">
+            <argument type="service" id="tntsearch.stemmer"/>
+            <argument type="service" id="tntsearch.stop.word"/>
+        </service>
+
+        <service id="tntsearch.indexation.provider" class="TntSearch\Service\Provider\IndexationProvider" />
+
+        <!--Services-->
+        <service id="tntsearch.update.index" class="TntSearch\Service\ItemIndexation">
+            <argument type="service" id="tntsearch.indexation.provider"/>
+            <argument type="service" id="tntsearch.provider"/>
+            <argument type="service" id="event_dispatcher"/>
+        </service>
+
+        <service id="tntsearch.stop.word" class="TntSearch\Service\StopWord">
+            <argument type="service" id="event_dispatcher"/>
+        </service>
+
+        <service id="tntsearch.stemmer" class="TntSearch\Service\Stemmer">
+            <argument type="service" id="event_dispatcher"/>
+        </service>
+
+        <service id="tntsearch.search" class="TntSearch\Service\Search">
+            <argument type="service" id="tntsearch.indexation.provider"/>
             <argument type="service" id="tntsearch.provider"/>
         </service>
 
-        <!-- needed to be used in loop...   -->
-        <service id="tntsearch.search" alias="TntSearch\Service\Search" public="true" />
-        <service id="tntsearch.indexation.provider" alias="TntSearch\Service\Provider\IndexationProvider" public="true" />
+        <!--Indexation -->
+        <service id="tntsearch.base.index" abstract="true">
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="tntsearch.provider"/>
+        </service>
+
+        <service id="tntsearch.index.product" class="TntSearch\Index\Product" parent="tntsearch.base.index" shared="false">
+            <tag name="tntsearch.index"/>
+        </service>
+        <service id="tntsearch.index.brand" class="TntSearch\Index\Brand" parent="tntsearch.base.index" shared="false">
+            <tag name="tntsearch.index"/>
+        </service>
+        <service id="tntsearch.index.customer" class="TntSearch\Index\Customer" parent="tntsearch.base.index" shared="false">
+            <tag name="tntsearch.index"/>
+        </service>
+        <service id="tntsearch.index.order" class="TntSearch\Index\Order" parent="tntsearch.base.index" shared="false">
+            <tag name="tntsearch.index"/>
+        </service>
+        <service id="tntsearch.index.category" class="TntSearch\Index\Category" parent="tntsearch.base.index" shared="false">
+            <tag name="tntsearch.index"/>
+        </service>
+        <service id="tntsearch.index.content" class="TntSearch\Index\Content" parent="tntsearch.base.index" shared="false">
+            <tag name="tntsearch.index"/>
+        </service>
+        <service id="tntsearch.index.folder" class="TntSearch\Index\Folder" parent="tntsearch.base.index" shared="false">
+            <tag name="tntsearch.index"/>
+        </service>
     </services>
 
     <hooks>

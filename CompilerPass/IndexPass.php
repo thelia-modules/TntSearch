@@ -5,7 +5,6 @@ namespace TntSearch\CompilerPass;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
-use TntSearch\Service\Provider\IndexationProvider;
 
 class IndexPass implements CompilerPassInterface
 {
@@ -13,13 +12,13 @@ class IndexPass implements CompilerPassInterface
      * @param ContainerBuilder $container
      * @return void
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
-        if (!$container->has(IndexationProvider::class)) {
+        if (!$container->has('tntsearch.indexation.provider')) {
             return;
         }
 
-        $definition = $container->findDefinition(IndexationProvider::class);
+        $definition = $container->findDefinition('tntsearch.indexation.provider');
 
         $taggedServices = $container->findTaggedServiceIds('tntsearch.index');
 

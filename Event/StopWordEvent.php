@@ -6,13 +6,13 @@ use Thelia\Core\Event\ActionEvent;
 
 class StopWordEvent extends ActionEvent
 {
-    const GET_STOP_WORDS = 'action.tntsearch.get.stop.words';
+    public const GET_STOP_WORDS = 'action.tntsearch.get.stop.words';
 
     /** @var string */
-    protected string $locale;
+    protected $locale;
 
     /** @var array */
-    protected array $stopWords = [];
+    protected $stopWords = [];
 
     /**
      * @return string

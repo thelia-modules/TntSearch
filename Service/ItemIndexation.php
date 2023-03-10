@@ -4,8 +4,7 @@ namespace TntSearch\Service;
 
 use Exception;
 use Propel\Runtime\ActiveQuery\Criteria;
-use Psr\EventDispatcher\EventDispatcherInterface;
-use TeamTNT\TNTSearch\Indexer\TNTIndexer;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\LangQuery;
@@ -13,15 +12,24 @@ use TntSearch\Event\ExtendQueryEvent;
 use TntSearch\Index\TntSearchIndexInterface;
 use TntSearch\Service\Provider\IndexationProvider;
 use TntSearch\Service\Provider\TntSearchProvider;
+use TntSearch\Service\Support\TntIndexer;
 
 class ItemIndexation
 {
-    public function __construct(
-        protected IndexationProvider $indexationProvider,
-        protected TntSearchProvider  $tntSearchProvider,
-        protected EventDispatcherInterface $dispatcher
-    )
+    /** @var IndexationProvider */
+    protected $indexationProvider;
+
+    /** @var TntSearchProvider */
+    protected $tntSearchProvider;
+
+    /** @var EventDispatcherInterface */
+    protected $dispatcher;
+
+    public function __construct( IndexationProvider $indexationProvider, TntSearchProvider  $tntSearchProvider, EventDispatcherInterface $dispatcher )
     {
+        $this->dispatcher = $dispatcher;
+        $this->tntSearchProvider = $tntSearchProvider;
+        $this->indexationProvider = $indexationProvider;
     }
 
     /**
@@ -44,7 +52,7 @@ class ItemIndexation
                     ->setItemId(null)
                     ->setItemType($indexName);
 
-                $this->dispatcher->dispatch($extendQueryEvent, ExtendQueryEvent::EXTEND_QUERY . $indexName);
+                $this->dispatcher->dispatch(ExtendQueryEvent::EXTEND_QUERY . $indexName, $extendQueryEvent);
 
                 $tntIndexer->query($extendQueryEvent->getQuery());
                 $tntIndexer->run();

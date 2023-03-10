@@ -1,7 +1,6 @@
 <?php
 
 namespace TntSearch\Controller\Front;
-
 use OpenApi\Annotations as OA;
 use OpenApi\Model\Api\ModelFactory;
 use OpenApi\Service\OpenApiService;
@@ -9,16 +8,15 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\Routing\Annotation\Route;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\HttpFoundation\Request;
-use Thelia\Model\Map\ContentTableMap;
+use Thelia\Core\HttpFoundation\Response;
 use TntSearch\Service\Search;
 
 /**
- * @Route("/open_api/tnt-search", name="tntsearch_search")
+ * @Route("/open_api", name="tntsearch_search")
  */
 class SearchOpenApiController extends BaseFrontController
 {
     /**
-     * @Route("", name="indexes_search", methods="GET")
      *
      * @OA\Get(
      *     path="/tnt-search",
@@ -64,14 +62,24 @@ class SearchOpenApiController extends BaseFrontController
      *     )
      * )
      */
-    public function apiSearch(Search $search, Request $request, ModelFactory $modelFactory)
+    public function apiSearch(): Response
     {
+        /** @var Search $search */
+        $search = $this->getContainer()->get('tntsearch.search');
+
+        /** @var Request $request */
+        $request = $this->getRequest();
+
+        /** @var ModelFactory $modelFactory */
+        $modelFactory = $this->getContainer()->get('open_api.model.factory');
+
+
         $resultsByIndex = $search->search(
             $request->get('q'),
             ($index = $request->get('indexes')) ? explode(',', $index) : null,
             $request->getSession()->getLang()->getLocale(),
             $request->get('offset', 0),
-            $request->get('limit', 100),
+            $request->get('limit', 100)
         );
 
         $data = [];
@@ -97,6 +105,6 @@ class SearchOpenApiController extends BaseFrontController
             }, iterator_to_array($rows));
         }
 
-        return OpenApiService::jsonResponse($data);
+        return $this->jsonResponse(json_encode($data));
     }
 }

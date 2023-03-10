@@ -9,7 +9,7 @@ use TntSearch\Index\TntSearchIndexInterface;
 class IndexationProvider
 {
     /** @var TntSearchIndexInterface[] */
-    protected array $indexes;
+    protected $indexes;
 
     /**
      * @param $index

@@ -17,7 +17,7 @@ class Brand extends BaseIndex
     public function buildSqlQuery(int $itemId = null, string $locale = null): string
     {
         return '
-             SELECT b.id AS id,
+            SELECT b.id AS id,
             bi.title AS title,
             bi.chapo AS chapo,
             bi.description AS description,

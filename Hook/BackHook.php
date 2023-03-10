@@ -8,7 +8,7 @@ use TntSearch\TntSearch;
 
 class BackHook extends BaseHook
 {
-    public function onModuleConfig(HookRenderEvent $event)
+    public function onModuleConfig(HookRenderEvent $event): void
     {
         $event->add(
             $this->render(

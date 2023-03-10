@@ -3,22 +3,19 @@
 namespace TntSearch;
 
 use Propel\Runtime\Connection\ConnectionInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Loader\Configurator\ServicesConfigurator;
 use Thelia\Module\BaseModule;
 use TntSearch\CompilerPass\IndexPass;
-use TntSearch\Index\BaseIndex;
 
 class TntSearch extends BaseModule
 {
     /** @var string */
-    const DOMAIN_NAME = 'tntsearch';
+    public const DOMAIN_NAME = 'tntsearch';
 
     /** @var string */
-    const INDEXES_DIR = THELIA_LOCAL_DIR . "TNTIndexes";
+    public const INDEXES_DIR = THELIA_LOCAL_DIR . "TNTIndexes";
 
     /** @var string */
-    const ON_THE_FLY_UPDATE = 'tntsearch.on_the_fly_update';
+    public const ON_THE_FLY_UPDATE = 'tntsearch.on_the_fly_update';
 
     public function postActivation(ConnectionInterface $con = null): void
     {
@@ -42,28 +39,4 @@ class TntSearch extends BaseModule
         ];
     }
 
-    /**
-     * @param ServicesConfigurator $servicesConfigurator
-     * @return void
-     */
-    public static function configureServices(ServicesConfigurator $servicesConfigurator): void
-    {
-        $servicesConfigurator->load(self::getModuleCode() . '\\', __DIR__)
-            ->exclude([THELIA_MODULE_DIR . ucfirst(self::getModuleCode()) . '/I18n/*'])
-            ->autowire()
-            ->autoconfigure();
-    }
-
-    /**
-     * @param ContainerBuilder $containerBuilder
-     * @return void
-     */
-    public static function loadConfiguration(ContainerBuilder $containerBuilder): void
-    {
-        $containerBuilder->registerForAutoconfiguration(BaseIndex::class)
-            ->setPublic(true)
-            ->setShared(false)
-            ->setParent("tntsearch.base.index")
-            ->addTag('tntsearch.index');
-    }
 }

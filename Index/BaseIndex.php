@@ -4,8 +4,8 @@ namespace TntSearch\Index;
 
 use Exception;
 use Propel\Runtime\ActiveQuery\Criteria;
-use Psr\EventDispatcher\EventDispatcherInterface;
 use ReflectionClass;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\LangQuery;
@@ -15,12 +15,16 @@ use TntSearch\Tokenizer\Tokenizer;
 
 abstract class BaseIndex implements TntSearchIndexInterface
 {
-    public function __construct(
-        protected EventDispatcherInterface $disptacher,
-        protected TntSearchProvider        $tntSearchProvider
-    )
-    {
+    /** @var EventDispatcherInterface */
+    private $disptacher;
 
+    /** @var TntSearchProvider */
+    private $tntSearchProvider;
+
+    public function __construct( EventDispatcherInterface $disptacher, TntSearchProvider $tntSearchProvider )
+    {
+        $this->disptacher = $disptacher;
+        $this->tntSearchProvider = $tntSearchProvider;
     }
 
     /**
@@ -93,7 +97,7 @@ abstract class BaseIndex implements TntSearchIndexInterface
                 ->setItemId(null)
                 ->setItemType($indexName);
 
-            $this->disptacher->dispatch($extendQueryEvent, ExtendQueryEvent::EXTEND_QUERY . $indexName);
+            $this->disptacher->dispatch(ExtendQueryEvent::EXTEND_QUERY . $indexName, $extendQueryEvent);
 
             $tntIndexer->query($extendQueryEvent->getQuery());
             $tntIndexer->run();

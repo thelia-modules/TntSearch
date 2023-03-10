@@ -10,13 +10,18 @@ use TntSearch\Service\Support\TntSearch;
 class TntSearchProvider
 {
     /** @var string */
-    const INDEXES_DIR = THELIA_LOCAL_DIR . "TNTIndexes";
+    public const INDEXES_DIR = THELIA_LOCAL_DIR . "TNTIndexes";
 
-    public function __construct(
-        protected Stemmer $stemmer,
-        protected StopWord $stopWord
-    )
+    /** @var Stemmer */
+    protected $stemmer;
+
+    /** @var StopWord */
+    protected $stopWord;
+
+    public function __construct( Stemmer $stemmer, StopWord $stopWord )
     {
+        $this->stopWord = $stopWord;
+        $this->stemmer = $stemmer;
     }
 
     /**

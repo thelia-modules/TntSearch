@@ -7,8 +7,12 @@ use TntSearch\Event\StopWordEvent;
 
 class StopWord
 {
-    public function __construct(protected EventDispatcherInterface $dispatcher)
+    /** @var EventDispatcherInterface */
+    protected $dispatcher;
+
+    public function __construct(EventDispatcherInterface $dispatcher)
     {
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -20,13 +24,13 @@ class StopWord
         $event = new StopWordEvent();
         $event->setLocale($locale);
 
-        $this->dispatcher->dispatch($event, StopWordEvent::GET_STOP_WORDS);
+        $this->dispatcher->dispatch(StopWordEvent::GET_STOP_WORDS, $event);
 
         if ($event->getStopWords() || !is_file($file = __DIR__ . '/../StopWords/' . $locale . '.json')) {
             return $event->getStopWords();
         }
 
-        $event->setStopWords(json_decode(file_get_contents($file)));
+        $event->setStopWords(json_decode(file_get_contents($file), true));
 
         return $event->getStopWords();
     }

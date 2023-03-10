@@ -2,8 +2,6 @@
 
 namespace TntSearch\Loop;
 
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -13,13 +11,11 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use TntSearch\Service\Provider\IndexationProvider;
 use TntSearch\Service\Search;
 
+
 /**
- * @method string getSearch()
- * @method string getSearchFor()
- * @method string getLocale()
- * @method string getBackendContext()
- * @method string getLimit()
- * @method string getOffset()
+ * @method getSearch()
+ * @method getLocale()
+ * @method getSearchFor()
  */
 class SearchLoop extends BaseLoop implements ArraySearchLoopInterface
 {
@@ -35,10 +31,6 @@ class SearchLoop extends BaseLoop implements ArraySearchLoopInterface
         );
     }
 
-    /**
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
     public function buildArray(): array
     {
         $request = $this->getCurrentRequest();
@@ -51,7 +43,7 @@ class SearchLoop extends BaseLoop implements ArraySearchLoopInterface
         if (!$locale = $this->getLocale()) {
             $locale = $session->getLang()->getLocale();
             if ($this->getBackendContext()) {
-                $locale = $session->getAdminEditionLang()->getLocale();
+                $locale = $session->getAdminLang()->getLocale();
             }
         }
 

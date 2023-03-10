@@ -3,25 +3,34 @@
 namespace TntSearch\Service;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use TeamTNT\TNTSearch\Stemmer\GermanStemmer;
+use TeamTNT\TNTSearch\Stemmer\ItalianStemmer;
+use TeamTNT\TNTSearch\Stemmer\PolishStemmer;
+use TeamTNT\TNTSearch\Stemmer\PorterStemmer;
+use TeamTNT\TNTSearch\Stemmer\RussianStemmer;
 use TntSearch\Event\StemmerEvent;
+use TntSearch\Stemmer\FrenchStemmer;
 
 class Stemmer
 {
-    protected string $defaultStemmer = \TeamTNT\TNTSearch\Stemmer\PorterStemmer::class;
+    /** @var string */
+    protected $defaultStemmer = PorterStemmer::class;
 
     /** @var string[] */
-    protected array $stemmers = [
-        'fr_FR' => \TntSearch\Stemmer\FrenchStemmer::class,
-        'it_IT' => \TeamTNT\TNTSearch\Stemmer\ItalianStemmer::class,
-        'de_DE' => \TeamTNT\TNTSearch\Stemmer\GermanStemmer::class,
-        'pt_PT' => \TeamTNT\TNTSearch\Stemmer\PolishStemmer::class,
-        'ru_RU' => \TeamTNT\TNTSearch\Stemmer\RussianStemmer::class,
+    protected $stemmers = [
+        'fr_FR' => FrenchStemmer::class,
+        'it_IT' => ItalianStemmer::class,
+        'de_DE' => GermanStemmer::class,
+        'pt_PT' => PolishStemmer::class,
+        'ru_RU' => RussianStemmer::class,
     ];
 
-    public function __construct(
-        protected EventDispatcherInterface $dispatcher
-    )
+    /** @var EventDispatcherInterface */
+    protected $dispatcher;
+
+    public function __construct( EventDispatcherInterface $dispatcher )
     {
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -35,7 +44,7 @@ class Stemmer
             ->setStemmers($this->stemmers)
             ->setDefaultStemmer($this->defaultStemmer);
 
-        $this->dispatcher->dispatch($stemmerEvent, StemmerEvent::EXTEND_STEMMERS);
+        $this->dispatcher->dispatch(StemmerEvent::EXTEND_STEMMERS, $stemmerEvent);
 
         $stemmers = $stemmerEvent->getStemmers();
 
