@@ -11,11 +11,10 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use TntSearch\Service\Provider\IndexationProvider;
 use TntSearch\Service\Search;
 
-
 /**
- * @method getSearch()
- * @method getLocale()
- * @method getSearchFor()
+ * @method string getSearch()
+ * @method array getSearchFor()
+ * @method string getLocale()
  */
 class SearchLoop extends BaseLoop implements ArraySearchLoopInterface
 {

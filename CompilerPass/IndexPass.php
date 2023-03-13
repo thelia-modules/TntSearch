@@ -12,7 +12,9 @@ class IndexPass implements CompilerPassInterface
      * @param ContainerBuilder $container
      * @return void
      */
+
     public function process(ContainerBuilder $container): void
+
     {
         if (!$container->has('tntsearch.indexation.provider')) {
             return;

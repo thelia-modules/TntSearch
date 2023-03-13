@@ -9,6 +9,7 @@
     </commands>
 
     <loops>
+
         <loop name="search_loop" class="TntSearch\Loop\SearchLoop"/>
     </loops>
 

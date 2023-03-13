@@ -271,6 +271,7 @@
                         </tr>
                         </thead>
                         <tbody>
+
                         {loop type="category" name="category-search" backend_context=1 visible="*" id=$CATEGORY_IDS|default:0}
 
 
@@ -495,7 +496,9 @@
                         </tr>
                         </thead>
                         <tbody>
+
                         {loop type="folder" name="folder-search" backend_context=1 visible="*" id=$FOLDER_IDS|default:0}
+
                         {if $LOOP_COUNT < 26}
                             <tr>
                                 <td>{$ID}</td>
@@ -594,7 +597,9 @@
                         </tr>
                         </thead>
                         <tbody>
+                        
                         {loop type="content" name="content-search" backend_context=1 visible="*" id=$CONTENT_IDS|default:0}
+
                         {if $LOOP_COUNT < 26}
                             <tr>
                                 <td>{$ID}</td>
@@ -688,7 +693,9 @@
                         </tr>
                         </thead>
                         <tbody>
+
                         {loop type="brand" name="brand_search" visible="*" id=$BRAND_IDS|default:0}
+
                             <tr>
                                 <td>{$ID}</td>
                                 <td></td>
@@ -845,7 +852,6 @@ form_content        = {$smarty.capture.content_delete_dialog nofilter}
         form_content        = {$smarty.capture.customer_delete_dialog nofilter}
         form_id             = "customer_delete_dialog"
     }
-
 
     {* -- Delete brand confirmation dialog ----------------------------------- *}
 

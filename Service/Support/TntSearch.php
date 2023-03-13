@@ -80,8 +80,8 @@ class TntSearch extends BaseTNTSearch
      */
     public function getIndex(): TNTIndexer
     {
-        $indexer = new TNTIndexer;
 
+        $indexer = new TNTIndexer;
         $indexer->inMemory = false;
         $indexer->setIndex($this->index);
         $indexer->setStemmer($this->stemmer);
