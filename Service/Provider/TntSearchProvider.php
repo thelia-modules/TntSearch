@@ -10,7 +10,7 @@ use TntSearch\Service\Support\TntSearch;
 class TntSearchProvider
 {
     /** @var string */
-    const INDEXES_DIR = THELIA_LOCAL_DIR . "TNTIndexes";
+    public const INDEXES_DIR = THELIA_LOCAL_DIR . "TNTIndexes";
 
     public function __construct(
         protected Stemmer $stemmer,
@@ -51,7 +51,8 @@ class TntSearchProvider
             'storage' => self::INDEXES_DIR,
             'modes' => [''],
             'stemmer' => $stemmer,
-            'tokenizer' => $tokenizer
+            'tokenizer' => $tokenizer,
+            'driver' => ''
         ]);
 
         $tnt = new TntSearch($config);
