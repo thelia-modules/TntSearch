@@ -61,6 +61,10 @@ abstract class BaseIndex implements TntSearchIndexInterface
     }
 
     /**
+     * Checks if an index is translatable.
+     * If not: calls the method that will register the indexes
+     * Otherwise calls the method that will translate them.
+     *
      * @return void
      */
     public function index(): void
@@ -74,6 +78,8 @@ abstract class BaseIndex implements TntSearchIndexInterface
     }
 
     /**
+     * Register indexes.
+     *
      * @param string|null $locale
      * @return void
      */
@@ -107,6 +113,8 @@ abstract class BaseIndex implements TntSearchIndexInterface
     }
 
     /**
+     * Translate indexes and calls the method that will register them.
+     *
      * @return void
      */
     protected function indexTranslatableIndexes(): void

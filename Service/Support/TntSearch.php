@@ -86,7 +86,7 @@ class TntSearch extends BaseTNTSearch
         $indexer->setIndex($this->index);
         $indexer->setStemmer($this->stemmer);
         $indexer->setTokenizer($this->tokenizer);
-
+        $indexer->loadConfig($this->config);
         $connector = $indexer->createConnector($this->config);
         $this->dbh = $connector->connect($this->config);
 

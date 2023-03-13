@@ -40,7 +40,6 @@ class GenerateIndexesCommand extends ContainerAwareCommand
 
         try {
             $this->indexationProvider->indexAll();
-
         } catch (Exception $exception) {
             $output->write($exception->getMessage());
         }

@@ -56,7 +56,8 @@ class TntSearchProvider
             'storage' => self::INDEXES_DIR,
             'modes' => [''],
             'stemmer' => $stemmer,
-            'tokenizer' => $tokenizer
+            'tokenizer' => $tokenizer,
+            'driver' => ''
         ]);
 
         $tnt = new TntSearch($config);
