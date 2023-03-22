@@ -65,7 +65,6 @@ class TntSearchProvider
         if (!empty($stopWords)) {
             $tnt->setStopWords($stopWords);
         }
-
         return $tnt;
     }
 }

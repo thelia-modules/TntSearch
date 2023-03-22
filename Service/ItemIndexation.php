@@ -40,7 +40,6 @@ class ItemIndexation
     public function indexOneItemOnIndexes(int $itemId, string $itemIndexType): void
     {
         $index = $this->indexationProvider->getIndex($itemIndexType);
-
         foreach ($this->buildTNTIndexers($index) as $indexLocale => $tntIndexer) {
             if (!$index->isTranslatable()) {
                 $indexName = $index->getIndexName();

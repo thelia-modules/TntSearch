@@ -9,11 +9,6 @@ class Customer extends BaseIndex
         return false;
     }
 
-    public function getTokenizer(): string
-    {
-        return \TntSearch\Tokenizer\CustomerTokenizer::class;
-    }
-
     /**
      * @param int|null $itemId
      * @param string|null $locale
@@ -27,6 +22,7 @@ class Customer extends BaseIndex
             customer.firstname,                    
             customer.lastname, 
             customer.email, 
+            customer.email as email2,
             CONCAT(address.address1, address.address2, address.address3),            
             address.zipcode, 
             address.city  

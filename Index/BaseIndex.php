@@ -28,6 +28,8 @@ abstract class BaseIndex implements TntSearchIndexInterface
     }
 
     /**
+     * Applies the appropriate tokenization method to build the indexes.
+     *
      * @return string
      */
     public function getTokenizer(): string
@@ -36,6 +38,8 @@ abstract class BaseIndex implements TntSearchIndexInterface
     }
 
     /**
+     * Returns the name of the index.
+     *
      * @return string
      */
     public function getIndexName(): string
@@ -45,6 +49,8 @@ abstract class BaseIndex implements TntSearchIndexInterface
     }
 
     /**
+     * Create and returns the name of the file in which the created indexes will be exported.
+     *
      * @param string|null $locale
      * @return string
      */
