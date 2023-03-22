@@ -16,7 +16,7 @@
         <default key="_controller">TntSearch\Controller\SearchController::searchAdminAction</default>
     </route>
 
-    <!-- Front -->
+<!-- Front -->
     <route id="front_search" path="/search">
         <default key="_controller">TntSearch\Controller\Front\SearchController::search</default>
     </route>

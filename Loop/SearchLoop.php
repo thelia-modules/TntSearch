@@ -13,9 +13,10 @@ use TntSearch\Service\Search;
 
 
 /**
- * @method getSearch()
- * @method getLocale()
- * @method getSearchFor()
+ * @method string getSearch()
+ * @method array getSearchFor()
+ * @method string getLocale()
+ * @method string getBackendContext()
  */
 class SearchLoop extends BaseLoop implements ArraySearchLoopInterface
 {

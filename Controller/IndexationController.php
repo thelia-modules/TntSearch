@@ -25,7 +25,6 @@ class IndexationController extends BaseAdminController
             if (is_dir(TntSearch::INDEXES_DIR)) {
                 $fs->remove(TntSearch::INDEXES_DIR);
             }
-
             $indexationProvider->indexAll();
 
         } catch (Exception $exception) {

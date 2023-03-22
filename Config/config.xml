@@ -25,6 +25,7 @@
             <argument type="service" id="tntsearch.stop.word"/>
         </service>
 
+
         <service id="tntsearch.indexation.provider" class="TntSearch\Service\Provider\IndexationProvider" />
 
         <!--Services-->

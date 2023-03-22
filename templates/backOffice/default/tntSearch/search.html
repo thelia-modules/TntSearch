@@ -496,6 +496,7 @@
                         </thead>
                         <tbody>
                         {loop type="folder" name="folder-search" backend_context=1 visible="*" id=$FOLDER_IDS|default:0}
+
                         {if $LOOP_COUNT < 26}
                             <tr>
                                 <td>{$ID}</td>
@@ -595,6 +596,7 @@
                         </thead>
                         <tbody>
                         {loop type="content" name="content-search" backend_context=1 visible="*" id=$CONTENT_IDS|default:0}
+                        
                         {if $LOOP_COUNT < 26}
                             <tr>
                                 <td>{$ID}</td>
@@ -689,6 +691,7 @@
                         </thead>
                         <tbody>
                         {loop type="brand" name="brand_search" visible="*" id=$BRAND_IDS|default:0}
+
                             <tr>
                                 <td>{$ID}</td>
                                 <td></td>
@@ -779,7 +782,7 @@ form_content        = {$smarty.capture.category_delete_dialog nofilter}
         <input type="hidden" name="product_id" id="product_delete_id" value=""/>
         {hook name="product.delete-form" location="product_delete_form" }
     {/capture}
-
+    
     {include
     file = "includes/generic-confirm-dialog.html"
 
