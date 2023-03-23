@@ -87,6 +87,7 @@ class TntIndexer extends BaseTNTIndexer
         if ($this->decodeHTMLEntities) {
             $text = html_entity_decode($text);
         }
+        $text = str_replace(['(', ')'], ' ', $text);
 
         if($this->isFieldWithNgramTokenization) {
             $edgeTokenizer = new EdgeNgramTokenizer();

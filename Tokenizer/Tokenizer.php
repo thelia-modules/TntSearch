@@ -15,6 +15,12 @@ class Tokenizer extends AbstractTokenizer implements TokenizerInterface
     {
         $text  = mb_strtolower(strip_tags($text));
         $split = preg_split($this->getPattern(), $text, -1, PREG_SPLIT_NO_EMPTY);
-        return array_diff($split, $stopwords);
+        $reducedSplit = [];
+        foreach ($split as $index) {
+            if(strlen($index) >= 2){
+                $reducedSplit[] = $index;
+            }
+        }
+        return array_diff($reducedSplit, $stopwords);
     }
 }
