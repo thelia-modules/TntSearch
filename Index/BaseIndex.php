@@ -18,22 +18,15 @@ abstract class BaseIndex implements TntSearchIndexInterface
     public function __construct(
         protected EventDispatcherInterface $disptacher,
         protected TntSearchProvider        $tntSearchProvider
-    )
-    {
+    ) {}
 
-    }
-
-    /**
-     * @return string
-     */
+    /** @return string */
     public function getTokenizer(): string
     {
         return Tokenizer::class;
     }
 
-    /**
-     * @return string
-     */
+    /** @return string */
     public function getIndexName(): string
     {
         $reflectionClass = new ReflectionClass(get_called_class());

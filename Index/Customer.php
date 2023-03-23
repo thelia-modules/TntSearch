@@ -9,11 +9,6 @@ class Customer extends BaseIndex
         return false;
     }
 
-    public function getTokenizer(): string
-    {
-        return \TntSearch\Tokenizer\CustomerTokenizer::class;
-    }
-
     /**
      * @param int|null $itemId
      * @param string|null $locale
