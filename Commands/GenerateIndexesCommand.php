@@ -12,7 +12,7 @@ use TntSearch\TntSearch;
 
 class GenerateIndexesCommand extends ContainerAwareCommand
 {
-    public function configure()
+    public function configure() : void
     {
         $this
             ->setName('tntsearch:indexes')
@@ -23,9 +23,6 @@ class GenerateIndexesCommand extends ContainerAwareCommand
     {
         $fs = new Filesystem();
 
-        /** @var IndexationProvider $indexationProvider */
-        $indexationProvider = $this->getContainer()->get('tntsearch.indexation.provider');
-
         if (is_dir(TntSearch::INDEXES_DIR)) {
             $fs->remove(TntSearch::INDEXES_DIR);
         }
@@ -33,6 +30,9 @@ class GenerateIndexesCommand extends ContainerAwareCommand
         ini_set('max_execution_time', 3600);
 
         try {
+            /** @var IndexationProvider $indexationProvider */
+            $indexationProvider = $this->getContainer()->get('tntsearch.indexation.provider');
+
             $indexationProvider->indexAll();
 
         } catch (Exception $exception) {

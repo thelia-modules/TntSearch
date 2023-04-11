@@ -8,36 +8,26 @@ use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
-use Thelia\Type\EnumListType;
-use Thelia\Type\TypeCollection;
+use Thelia\Model\Admin;
+use TntSearch\Service\Provider\IndexationProvider;
 use TntSearch\Service\Search;
 
 /**
  * @method string getSearch()
  * @method array getSearchFor()
  * @method string getLocale()
- * @method string getBackendContext()
  */
 class SearchLoop extends BaseLoop implements ArraySearchLoopInterface
 {
     protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
-            new Argument(
-                'search_for',
-                new TypeCollection(
-                    new EnumListType(
-                        array(
-                            'product', 'category', 'brand',
-                            'folder', 'content', 'order', 'customer', '*'
-                        )
-                    )
-                )
-            ),
-            Argument::createAlphaNumStringTypeArgument('locale'),
+            Argument::createAnyTypeArgument('search_for', '*'),
+            Argument::createAnyTypeArgument('locale'),
             Argument::createBooleanTypeArgument('backend_context'),
             Argument::createAnyTypeArgument('search'),
-            Argument::createIntTypeArgument('limit', 100)
+            Argument::createIntTypeArgument('limit', 100),
+            Argument::createIntTypeArgument('offset', 0)
         );
     }
 
@@ -46,26 +36,35 @@ class SearchLoop extends BaseLoop implements ArraySearchLoopInterface
         $request = $this->getCurrentRequest();
         $session = $request->getSession();
 
+        if (!$search = $this->getSearch()) {
+            return [];
+        }
+
         if (!$locale = $this->getLocale()) {
             $locale = $session->getLang()->getLocale();
             if ($this->getBackendContext()) {
-                $locale = $session->getAdminEditionLang()->getLocale();
+                /** @var Admin $adminUser */
+                $adminUser = $session->getAdminUser();
+                $locale = $adminUser->getLocale();
             }
         }
-
-        $indexes = $this->getSearchFor();
 
         $offset = $this->getOffset();
         $limit = $this->getLimit();
 
-        if (in_array("*", $indexes, true)) {
-            $indexes = ['customer', 'order', 'product', 'category', 'folder', 'content', 'brand'];
+        /** @var IndexationProvider $indexationProvider */
+        $indexationProvider = $this->container->get('tntsearch.indexation.provider');
+
+        $indexes = array_keys($indexationProvider->getIndexes());
+
+        if ('*' !== $this->getSearchFor()) {
+            $indexes = array_intersect(explode(',', $this->getSearchFor()), $indexes);
         }
 
         /** @var Search $searchProvider */
         $searchProvider = $this->container->get('tntsearch.search');
 
-        return $searchProvider->search($this->getSearch(), $indexes, $offset, $limit, $locale);
+        return $searchProvider->search($search, $indexes, $locale, $offset, $limit);
     }
 
     /**
@@ -76,10 +75,6 @@ class SearchLoop extends BaseLoop implements ArraySearchLoopInterface
     {
         foreach ($loopResult->getResultDataCollection() as $searchType => $result) {
             $loopResultRow = new LoopResultRow();
-
-            if ($searchType === 'product') {
-                $loopResultRow->set("PRODUCTS_COUNT", count($result));
-            }
 
             $loopResultRow->set(strtoupper($searchType), $result ? implode(',', $result) : 0);
 

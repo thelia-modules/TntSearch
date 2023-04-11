@@ -3,29 +3,25 @@
 namespace TntSearch\Service\Provider;
 
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Yaml\Yaml;
 use TntSearch\Service\Stemmer;
 use TntSearch\Service\StopWord;
 use TntSearch\Service\Support\TntSearch;
 
 class TntSearchProvider
 {
+    /** @var string */
+    public const INDEXES_DIR = THELIA_LOCAL_DIR . "TNTIndexes";
+
     /** @var Stemmer */
-    private $stemmer;
+    protected $stemmer;
 
     /** @var StopWord */
-    private $stopWord;
+    protected $stopWord;
 
-    /** @var string */
-    const INDEXES_DIR = THELIA_LOCAL_DIR . "TNTIndexes";
-
-    public function __construct(
-        Stemmer $stemmer,
-        StopWord $stopWord
-    )
+    public function __construct( Stemmer $stemmer, StopWord $stopWord )
     {
-        $this->stemmer = $stemmer;
         $this->stopWord = $stopWord;
+        $this->stemmer = $stemmer;
     }
 
     /**
@@ -56,11 +52,12 @@ class TntSearchProvider
         }
 
         // You need to empty the modes to set the sql_mode parameter to null
-        $config = array_merge($this->getConnectionData(), [
+        $config = array_merge([
             'storage' => self::INDEXES_DIR,
             'modes' => [''],
             'stemmer' => $stemmer,
-            'tokenizer' => $tokenizer
+            'tokenizer' => $tokenizer,
+            'driver' => ''
         ]);
 
         $tnt = new TntSearch($config);
@@ -70,39 +67,5 @@ class TntSearchProvider
         }
 
         return $tnt;
-    }
-
-    /**
-     * @return array
-     */
-    protected function getConnectionData(): array
-    {
-        $configFile = THELIA_CONF_DIR . "database.yml";
-
-        $propelParameters = Yaml::parse(file_get_contents($configFile))['database']['connection'];
-
-        $driver = $propelParameters['driver'];
-        $user = $propelParameters['user'];
-        $password = $propelParameters['password'];
-
-        $explodeDns = explode(';', $propelParameters['dsn']);
-        $arrayDns = [];
-
-        foreach ($explodeDns as $param) {
-            $value = explode('=', $param);
-            $arrayDns[$value[0]] = $value[1];
-        }
-
-        $host = $arrayDns['mysql:host'];
-        $database = $arrayDns['dbname'];
-
-        return [
-            'driver' => $driver,
-            'host' => $host,
-            'charset' => 'utf8',
-            'database' => $database,
-            'username' => $user,
-            'password' => $password,
-        ];
     }
 }

@@ -35,7 +35,7 @@ class IndexationProvider
     }
 
     /**
-     * @param string $indexName
+     * @param string $indexType
      * @return TntSearchIndexInterface
      */
     public function getIndex(string $indexType): TntSearchIndexInterface

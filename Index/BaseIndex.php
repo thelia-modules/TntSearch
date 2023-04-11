@@ -5,18 +5,25 @@ namespace TntSearch\Index;
 use Exception;
 use Propel\Runtime\ActiveQuery\Criteria;
 use ReflectionClass;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\LangQuery;
+use TntSearch\Event\ExtendQueryEvent;
 use TntSearch\Service\Provider\TntSearchProvider;
+use TntSearch\Tokenizer\Tokenizer;
 
 abstract class BaseIndex implements TntSearchIndexInterface
 {
+    /** @var EventDispatcherInterface */
+    private $disptacher;
+
     /** @var TntSearchProvider */
     private $tntSearchProvider;
 
-    public function __construct(TntSearchProvider $tntSearchProvider)
+    public function __construct( EventDispatcherInterface $disptacher, TntSearchProvider $tntSearchProvider )
     {
+        $this->disptacher = $disptacher;
         $this->tntSearchProvider = $tntSearchProvider;
     }
 
@@ -25,7 +32,7 @@ abstract class BaseIndex implements TntSearchIndexInterface
      */
     public function getTokenizer(): string
     {
-        return \TntSearch\Tokenizer\TheliaTokenizer::class;
+        return Tokenizer::class;
     }
 
     /**
@@ -54,6 +61,10 @@ abstract class BaseIndex implements TntSearchIndexInterface
     }
 
     /**
+     * Checks if an index is translatable.
+     * If not: calls the method that will register the indexes
+     * Otherwise calls the method that will translate them.
+     *
      * @return void
      */
     public function index(): void
@@ -67,12 +78,13 @@ abstract class BaseIndex implements TntSearchIndexInterface
     }
 
     /**
+     * Register indexes.
+     *
      * @param string|null $locale
      * @return void
      */
     protected function indexOneIndex(string $locale = null): void
     {
-
         $indexFileName = $this->getIndexFileName($locale);
 
         try {
@@ -83,15 +95,26 @@ abstract class BaseIndex implements TntSearchIndexInterface
             $tntIndexer = $tntSate->createIndex($indexFileName);
             $tntIndexer->decodeHtmlEntities();
 
-            $tntIndexer->query($query);
-            $tntIndexer->run();
+            $indexName = $this->getIndexName();
 
+            $extendQueryEvent = new ExtendQueryEvent();
+            $extendQueryEvent
+                ->setQuery($query)
+                ->setItemId(null)
+                ->setItemType($indexName);
+
+            $this->disptacher->dispatch(ExtendQueryEvent::EXTEND_QUERY . $indexName, $extendQueryEvent);
+
+            $tntIndexer->query($extendQueryEvent->getQuery());
+            $tntIndexer->run();
         } catch (Exception $ex) {
             Tlog::getInstance()->addError("Error indexation on index $indexFileName : " . $ex->getMessage());
         }
     }
 
     /**
+     * Translate indexes and calls the method that will register them.
+     *
      * @return void
      */
     protected function indexTranslatableIndexes(): void

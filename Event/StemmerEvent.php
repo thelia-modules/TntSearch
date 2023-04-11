@@ -6,7 +6,7 @@ use Thelia\Core\Event\ActionEvent;
 
 class StemmerEvent extends ActionEvent
 {
-    const EXTEND_STEMMERS = 'action.tntsearch.extended.stemmer';
+    public const EXTEND_STEMMERS = 'action.tntsearch.extended.stemmer';
 
     /**
      * @var string

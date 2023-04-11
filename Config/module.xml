@@ -13,15 +13,19 @@
         <language>en_US</language>
         <language>fr_FR</language>
     </languages>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <authors>
         <author>
-            <name>Nicolas Barbey</name>
-            <email>nbarbey@openstudio.com</email>
+            <name>Bertrand tourlonias</name>
+            <company>OpenStudio</company>
+            <email>btourlonias@openstudio.com</email>
+            <website>www.openstudio.fr</website>
         </author>
         <author>
-            <name>Bertrand tourlonias</name>
-            <email>btourlonias@openstudio.com</email>
+            <name>Nicolas Barbey</name>
+            <company>OpenStudio</company>
+            <email>nbarbey@openstudio.com</email>
+            <website>www.openstudio.fr</website>
         </author>
         <author>
             <name>Franck Allimant</name>
@@ -31,7 +35,10 @@
         </author>
     </authors>
     <type>classic</type>
-    <thelia>2.3.4</thelia>
+    <required>
+        <module version=">=1.0.24">OpenApi</module>
+    </required>
+    <thelia>2.4.0</thelia>
     <stability>other</stability>
     <mandatory>0</mandatory>
     <hidden>0</hidden>

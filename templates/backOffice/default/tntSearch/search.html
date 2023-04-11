@@ -9,6 +9,8 @@
 {/block}
 
 {block name="main-content"}
+    {$page=$page|default:1}
+
     <div class="clearfix">
         <ul class="breadcrumb pull-left">
             <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
@@ -16,11 +18,16 @@
         </ul>
     </div>
 
-    {loop type="tnt-search" name="back-tnt-search-loop" search=$searchTerm backend_context=1 search_for="*"}
+    {loop type="search_loop" name="back-tnt-search-loop" search=$searchTerm backend_context=1}
         {$PRODUCTS_IDS = $PRODUCT}
         {$CUSTOMERS_IDS = $CUSTOMER}
-        {$BRANDS_IDS = $BRAND}
+        {$BRAND_IDS = $BRAND}
+        {$ORDER_IDS = $ORDER}
+        {$CATEGORY_IDS=$CATEGORY}
+        {$FOLDER_IDS=$FOLDER}
+        {$CONTENT_IDS=$CONTENT}
     {/loop}
+
         {* customer search *}
         <div class="general-block-decorator">
             <div class="table-responsive">
@@ -178,7 +185,7 @@
                     </thead>
 
                     <tbody>
-                    {loop type="order" name="order-search" backend_context=1 customer="*" id=$ORDER|default:0}
+                    {loop type="order" name="order-search" backend_context=1 customer="*" id=$ORDER_IDS|default:0}
                     {loop type="order_address" name="order-invoice-address" id=$INVOICE_ADDRESS}
                     {assign "orderInvoiceFirstName" $FIRSTNAME}
                     {assign "orderInvoiceLastName" $LASTNAME}
@@ -264,7 +271,8 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {loop type="category" name="category-search" backend_context=1 visible="*" id=$CATEGORY|default:0}
+
+                        {loop type="category" name="category-search" backend_context=1 visible="*" id=$CATEGORY_IDS|default:0}
 
 
                         {if $LOOP_COUNT < 26}
@@ -488,7 +496,9 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {loop type="folder" name="folder-search" backend_context=1 visible="*" id=$FOLDER|default:0}
+
+                        {loop type="folder" name="folder-search" backend_context=1 visible="*" id=$FOLDER_IDS|default:0}
+
                         {if $LOOP_COUNT < 26}
                             <tr>
                                 <td>{$ID}</td>
@@ -587,7 +597,9 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {loop type="content" name="content-search" backend_context=1 visible="*" id=$CONTENT|default:0}
+                        
+                        {loop type="content" name="content-search" backend_context=1 visible="*" id=$CONTENT_IDS|default:0}
+
                         {if $LOOP_COUNT < 26}
                             <tr>
                                 <td>{$ID}</td>
@@ -681,7 +693,9 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {loop type="brand" name="brand_search" visible="*" id=$BRAND|default:0}
+
+                        {loop type="brand" name="brand_search" visible="*" id=$BRAND_IDS|default:0}
+
                             <tr>
                                 <td>{$ID}</td>
                                 <td></td>
@@ -828,17 +842,16 @@ form_content        = {$smarty.capture.content_delete_dialog nofilter}
     {/capture}
 
     {include
-    file = "includes/generic-confirm-dialog.html"
+        file = "includes/generic-confirm-dialog.html"
 
-    dialog_id       = "delete_customer_dialog"
-    dialog_title    = {intl l="Delete customer"}
-    dialog_message  = {intl l="Do you really want to delete this customer ?"}
+        dialog_id       = "delete_customer_dialog"
+        dialog_title    = {intl l="Delete customer"}
+        dialog_message  = {intl l="Do you really want to delete this customer ?"}
 
-form_action         = {token_url path='/admin/customer/delete'}
-form_content        = {$smarty.capture.customer_delete_dialog nofilter}
-form_id             = "customer_delete_dialog"
-}
-
+        form_action         = {token_url path='/admin/customer/delete'}
+        form_content        = {$smarty.capture.customer_delete_dialog nofilter}
+        form_id             = "customer_delete_dialog"
+    }
 
     {* -- Delete brand confirmation dialog ----------------------------------- *}
 

@@ -2,10 +2,10 @@
 
 namespace TntSearch\Service;
 
+use Couchbase\IndexNotFoundException;
 use Exception;
-use TeamTNT\TNTSearch\Exceptions\IndexNotFoundException;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Log\Tlog;
-use TntSearch\Index\TntSearchIndexInterface;
 use TntSearch\Service\Provider\IndexationProvider;
 use TntSearch\Service\Provider\TntSearchProvider;
 
@@ -17,10 +17,7 @@ class Search
     /** @var TntSearchProvider */
     private $tntSearchProvider;
 
-    public function __construct(
-        IndexationProvider $indexationProvider,
-        TntSearchProvider  $tntSearchProvider
-    )
+    public function __construct( IndexationProvider $indexationProvider, TntSearchProvider  $tntSearchProvider )
     {
         $this->indexationProvider = $indexationProvider;
         $this->tntSearchProvider = $tntSearchProvider;
@@ -28,26 +25,25 @@ class Search
 
     /**
      * @param string $searchWords
-     * @param array $indexTypes
-     * @param int $offset
-     * @param int $limit
-     * @param string|null $locale
+     * @param ?array $indexes
+     * @param ?string $locale
+     * @param ?int $offset
+     * @param ?int $limit
      * @return array
      */
     public function search(
         string $searchWords,
-        array  $indexTypes,
-        int    $offset,
-        int    $limit,
-        string $locale = null
+        ?array  $indexes,
+        ?string $locale,
+        ?int    $offset,
+        ?int    $limit
     ): array
     {
         $result = [];
 
-        /** @var TntSearchIndexInterface $indexCollection */
-        $indexCollection = $this->indexationProvider->findIndexes($indexTypes);
+        $indexlist = $indexes ? $this->indexationProvider->findIndexes($indexes): $this->indexationProvider->getIndexes();
 
-        foreach ($indexCollection as $index) {
+        foreach ($indexlist as $index) {
             try {
                 $indexLocale = $locale;
 
@@ -63,16 +59,28 @@ class Search
                     $offset,
                     $limit
                 );
-
             } catch (IndexNotFoundException $ex) {
-                Tlog::getInstance()->addError('Error inex missing : ' . $ex->getMessage());
+                Tlog::getInstance()->addError('Error index missing : ' . $ex->getMessage());
                 continue;
             } catch (Exception $ex) {
-                Tlog::getInstance()->addError('Error on TntSearch search');
+                Tlog::getInstance()->addError('Error on TntSearch search ' . $ex->getMessage());
                 continue;
             }
         }
 
         return $result;
+    }
+
+    public function buildPropelModelFromIndex(string $indexName): ModelCriteria
+    {
+        /** @var ModelCriteria $modelQuery */
+        $modelQuery = 'Thelia\\Model\\'.ucwords($indexName) . 'Query';
+
+        return $modelQuery::create();
+    }
+
+    public function buildPropelTableMapFromIndex(string $indexName): string
+    {
+        return 'Thelia\\Model\\Map\\'.ucwords($indexName) . 'TableMap';
     }
 }

@@ -5,23 +5,23 @@ namespace TntSearch\EventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Category\CategoryDeleteEvent;
 use Thelia\Core\Event\Category\CategoryEvent;
+use Thelia\Core\Event\Content\ContentDeleteEvent;
 use Thelia\Core\Event\Customer\CustomerEvent;
+use Thelia\Core\Event\Folder\FolderDeleteEvent;
+use Thelia\Core\Event\Folder\FolderEvent;
 use Thelia\Core\Event\Product\ProductDeleteEvent;
 use Thelia\Core\Event\Product\ProductEvent;
 use Thelia\Core\Event\TheliaEvents;
-use TntSearch\Service\IndexItem;
+use Thelia\Core\Event\Content\ContentEvent;
+use TntSearch\Service\ItemIndexation;
 use TntSearch\TntSearch;
 
 class IndexUpdateListener implements EventSubscriberInterface
 {
-    /**
-     * @var IndexItem
-     */
-    private $itemIndexation;
+    /** @var ItemIndexation */
+    protected $itemIndexation;
 
-    public function __construct(
-        IndexItem $itemIndexation
-    )
+    public function __construct(ItemIndexation $itemIndexation)
     {
         $this->itemIndexation = $itemIndexation;
     }
@@ -41,6 +41,14 @@ class IndexUpdateListener implements EventSubscriberInterface
             TheliaEvents::CATEGORY_CREATE => ['updateCategoryIndex', 50],
             TheliaEvents::CATEGORY_UPDATE => ['updateCategoryIndex', 50],
             TheliaEvents::CATEGORY_DELETE => ['updateCategoryIndex', 50],
+
+            TheliaEvents::FOLDER_CREATE => ['updateFolderIndex', 50],
+            TheliaEvents::FOLDER_UPDATE => ['updateFolderIndex', 50],
+            TheliaEvents::FOLDER_DELETE => ['updateFolderIndex', 50],
+
+            TheliaEvents::CONTENT_CREATE => ['updateContentIndex', 50],
+            TheliaEvents::CONTENT_UPDATE => ['updateContentIndex', 50],
+            TheliaEvents::CONTENT_DELETE => ['updateContentIndex', 50],
 
             TheliaEvents::CUSTOMER_CREATEACCOUNT => ['updateCustomerIndex', 50],
             TheliaEvents::CUSTOMER_UPDATEACCOUNT => ['updateCustomerIndex', 50],
@@ -89,6 +97,40 @@ class IndexUpdateListener implements EventSubscriberInterface
 
             if (!$deleteMode) {
                 $this->itemIndexation->indexOneItemOnIndexes($event->getCategory()->getId(), 'category');
+            }
+        }
+    }
+
+    /**
+     * @param FolderEvent $event
+     * @return void
+     */
+    public function updateFolderIndex(FolderEvent $event): void
+    {
+        if ($event->hasFolder()) {
+            $deleteMode = $event instanceof FolderDeleteEvent;
+
+            $this->itemIndexation->deleteItemOnIndexes($event->getFolder()->getId(), 'folder');
+
+            if (!$deleteMode) {
+                $this->itemIndexation->indexOneItemOnIndexes($event->getFolder()->getId(), 'folder');
+            }
+        }
+    }
+
+    /**
+     * @param ContentEvent $event
+     * @return void
+     */
+    public function updateContentIndex(ContentEvent $event): void
+    {
+        if ($event->hasContent()) {
+            $deleteMode = $event instanceof ContentDeleteEvent;
+
+            $this->itemIndexation->deleteItemOnIndexes($event->getContent()->getId(), 'content');
+
+            if (!$deleteMode) {
+                $this->itemIndexation->indexOneItemOnIndexes($event->getContent()->getId(), 'content');
             }
         }
     }

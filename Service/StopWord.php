@@ -7,10 +7,8 @@ use TntSearch\Event\StopWordEvent;
 
 class StopWord
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
+    /** @var EventDispatcherInterface */
+    protected $dispatcher;
 
     public function __construct(EventDispatcherInterface $dispatcher)
     {
@@ -32,7 +30,7 @@ class StopWord
             return $event->getStopWords();
         }
 
-        $event->setStopWords(json_decode(file_get_contents($file)));
+        $event->setStopWords(json_decode(file_get_contents($file), true));
 
         return $event->getStopWords();
     }

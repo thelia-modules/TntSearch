@@ -9,7 +9,8 @@
     </commands>
 
     <loops>
-        <loop name="tnt-search" class="TntSearch\Loop\SearchLoop"/>
+
+        <loop name="search_loop" class="TntSearch\Loop\SearchLoop"/>
     </loops>
 
     <services>
@@ -25,12 +26,13 @@
             <argument type="service" id="tntsearch.stop.word"/>
         </service>
 
-        <service id="tntsearch.indexation.provider" class="TntSearch\Service\Provider\IndexationProvider">
-        </service>
+        <service id="tntsearch.indexation.provider" class="TntSearch\Service\Provider\IndexationProvider" />
 
-        <service id="tntsearch.update.index" class="TntSearch\Service\IndexItem">
+        <!--Services-->
+        <service id="tntsearch.update.index" class="TntSearch\Service\ItemIndexation">
             <argument type="service" id="tntsearch.indexation.provider"/>
             <argument type="service" id="tntsearch.provider"/>
+            <argument type="service" id="event_dispatcher"/>
         </service>
 
         <service id="tntsearch.stop.word" class="TntSearch\Service\StopWord">
@@ -41,8 +43,14 @@
             <argument type="service" id="event_dispatcher"/>
         </service>
 
+        <service id="tntsearch.search" class="TntSearch\Service\Search">
+            <argument type="service" id="tntsearch.indexation.provider"/>
+            <argument type="service" id="tntsearch.provider"/>
+        </service>
+
         <!--Indexation -->
         <service id="tntsearch.base.index" abstract="true">
+            <argument type="service" id="event_dispatcher"/>
             <argument type="service" id="tntsearch.provider"/>
         </service>
 
@@ -67,17 +75,11 @@
         <service id="tntsearch.index.folder" class="TntSearch\Index\Folder" parent="tntsearch.base.index" shared="false">
             <tag name="tntsearch.index"/>
         </service>
-
-        <!--Search -->
-        <service id="tntsearch.search" class="TntSearch\Service\Search">
-            <argument type="service" id="tntsearch.indexation.provider"/>
-            <argument type="service" id="tntsearch.provider"/>
-        </service>
     </services>
 
     <hooks>
         <hook id="tntsearch.hook" class="TntSearch\Hook\BackHook">
-            <tag name="hook.event_listener" event="module.configuration" type="back" method="onModuleConfiguration"/>
+            <tag name="hook.event_listener" event="module.configuration" type="back" method="onModuleConfig"/>
         </hook>
     </hooks>
 </config>

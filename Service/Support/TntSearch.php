@@ -1,24 +1,20 @@
 <?php
-/*************************************************************************************/
-/*      Copyright (c) OpenStudio                                                     */
-/*      web : https://www.openstudio.fr                                              */
-/*                                                                                   */
-/*      For the full copyright and license information, please view the LICENSE      */
-/*      file that was distributed with this source code.                             */
-/*************************************************************************************/
-
-/**
- * Created by Franck Allimant, OpenStudio <fallimant@openstudio.fr>
- * Date: 21/12/2021
- */
 
 namespace TntSearch\Service\Support;
 
 use Exception;
+use TntSearch\Service\Support\TntIndexer;
 use TeamTNT\TNTSearch\Exceptions\IndexNotFoundException;
-use TeamTNT\TNTSearch\Indexer\TNTIndexer;
 use TeamTNT\TNTSearch\TNTSearch as BaseTNTSearch;
 
+
+/**
+ * Extend TntSearch to rework stop words utilisation.
+ * ex : Stop words can be use to clean search words too
+ *
+ * Override create and get index to handle Propel instance
+ * @method selectIndex($getIndexFileName)
+ */
 class TntSearch extends BaseTNTSearch
 {
     /** @var array */
@@ -34,6 +30,8 @@ class TntSearch extends BaseTNTSearch
     }
 
     /**
+     * Force stop word on every tokenisation
+     *
      * @param $text
      * @return array
      */
@@ -52,6 +50,8 @@ class TntSearch extends BaseTNTSearch
     }
 
     /**
+     * Need to instantiate our TntIndexer.
+     *
      * @param string $indexName
      * @param boolean $disableOutput
      *
@@ -73,24 +73,24 @@ class TntSearch extends BaseTNTSearch
     }
 
     /**
+     * Need to instantiate our TntIndexer and set our connector.
+     *
      * @return TNTIndexer
      * @throws Exception
      */
     public function getIndex(): TNTIndexer
     {
-        $indexer           = new TNTIndexer;
+
+        $indexer = new TNTIndexer;
         $indexer->inMemory = false;
         $indexer->setIndex($this->index);
         $indexer->setStemmer($this->stemmer);
         $indexer->setTokenizer($this->tokenizer);
+        $indexer->loadConfig($this->config);
+        $connector = $indexer->createConnector($this->config);
+        $this->dbh = $connector->connect($this->config);
 
-        if (!$this->dbh) {
-            $connector = $indexer->createConnector($this->config);
-            $this->dbh = $connector->connect($this->config);
-
-        }
-
-        $indexer->setDatabaseHandle($this->dbh);
+        $indexer->setDatabasePropelConnector($this->dbh);
 
         return $indexer;
     }
