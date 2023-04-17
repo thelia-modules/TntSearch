@@ -9,11 +9,6 @@ class Content extends BaseIndex
         return true;
     }
 
-    /**
-     * @param int|null $itemId
-     * @param string|null $locale
-     * @return string
-     */
     public function buildSqlQuery(int $itemId = null, string $locale = null): string
     {
         return '

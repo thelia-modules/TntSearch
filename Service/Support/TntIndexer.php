@@ -10,9 +10,6 @@ class TntIndexer extends BaseTNTIndexer
 {
     /**
      * Override tu use propel instance instead of dsn.
-     *
-     * @param array $config
-     * @return PropelConnector
      */
     public function createConnector(array $config): PropelConnector
     {
@@ -21,8 +18,6 @@ class TntIndexer extends BaseTNTIndexer
 
     /**
      * Allow to handle PDOConnection from propel.
-     *
-     * @param PdoConnection $dbh
      */
     public function setDatabasePropelConnector($dbh): void
     {

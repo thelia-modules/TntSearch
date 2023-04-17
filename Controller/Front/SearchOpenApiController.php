@@ -81,7 +81,7 @@ class SearchOpenApiController extends BaseFrontController
                 continue;
             }
 
-            $model = $search->buildPropelModelFromIndex($index);
+            $model = $search->buildPropelQueryFromIndex($index);
             $modelTableMap = $search->buildPropelTableMapFromIndex($index);
 
             $rows = $model->filterById($ids, Criteria::IN);

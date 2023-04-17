@@ -51,7 +51,7 @@ class SearchLoop extends BaseLoop implements ArraySearchLoopInterface
         if (!$locale = $this->getLocale()) {
             $locale = $session->getLang()->getLocale();
             if ($this->getBackendContext()) {
-                $locale = $session->getAdminEditionLang()->getLocale();
+                $locale = $session->getAdminLang()->getLocale();
             }
         }
 

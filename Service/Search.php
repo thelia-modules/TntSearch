@@ -4,7 +4,6 @@ namespace TntSearch\Service;
 
 use Exception;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Propel\Runtime\Map\TableMap;
 use TeamTNT\TNTSearch\Exceptions\IndexNotFoundException;
 use Thelia\Log\Tlog;
 use TntSearch\Service\Provider\IndexationProvider;
@@ -15,18 +14,8 @@ class Search
     public function __construct(
         protected IndexationProvider $indexationProvider,
         protected TntSearchProvider  $tntSearchProvider
-    )
-    {
-    }
+    ) {}
 
-    /**
-     * @param string $searchWords
-     * @param ?array $indexes
-     * @param ?string $locale
-     * @param ?int $offset
-     * @param ?int $limit
-     * @return array
-     */
     public function search(
         string $searchWords,
         ?array  $indexes,
@@ -67,7 +56,7 @@ class Search
         return $result;
     }
 
-    public function buildPropelModelFromIndex(string $indexName): ModelCriteria
+    public function buildPropelQueryFromIndex(string $indexName): ModelCriteria
     {
         /** @var ModelCriteria $modelQuery */
         $modelQuery = 'Thelia\\Model\\'.ucwords($indexName) . 'Query';

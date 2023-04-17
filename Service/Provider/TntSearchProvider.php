@@ -9,21 +9,13 @@ use TntSearch\Service\Support\TntSearch;
 
 class TntSearchProvider
 {
-    /** @var string */
     const INDEXES_DIR = THELIA_LOCAL_DIR . "TNTIndexes";
 
     public function __construct(
         protected Stemmer $stemmer,
         protected StopWord $stopWord
-    )
-    {
-    }
+    ) {}
 
-    /**
-     * @param string|null $locale
-     * @param string|null $tokenizer
-     * @return TntSearch
-     */
     public function getTntSearch(string $tokenizer = null , string $locale = null): TntSearch
     {
         return $this->buildTntSearch(
@@ -33,12 +25,6 @@ class TntSearchProvider
         );
     }
 
-    /**
-     * @param string $stemmer
-     * @param array $stopWords
-     * @param string|null $tokenizer
-     * @return TntSearch
-     */
     public function buildTntSearch(string $stemmer, array $stopWords = [], string $tokenizer = null): TntSearch
     {
         if (!is_dir(self::INDEXES_DIR)) {
@@ -51,7 +37,8 @@ class TntSearchProvider
             'storage' => self::INDEXES_DIR,
             'modes' => [''],
             'stemmer' => $stemmer,
-            'tokenizer' => $tokenizer
+            'tokenizer' => $tokenizer,
+            'driver' => ''
         ]);
 
         $tnt = new TntSearch($config);

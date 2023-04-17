@@ -18,32 +18,19 @@ abstract class BaseIndex implements TntSearchIndexInterface
     public function __construct(
         protected EventDispatcherInterface $disptacher,
         protected TntSearchProvider        $tntSearchProvider
-    )
-    {
+    ) {}
 
-    }
-
-    /**
-     * @return string
-     */
     public function getTokenizer(): string
     {
         return Tokenizer::class;
     }
 
-    /**
-     * @return string
-     */
     public function getIndexName(): string
     {
         $reflectionClass = new ReflectionClass(get_called_class());
         return strtolower($reflectionClass->getShortName());
     }
 
-    /**
-     * @param string|null $locale
-     * @return string
-     */
     public function getIndexFileName(string $locale = null): string
     {
         $indexName = $this->getIndexName();
@@ -56,9 +43,6 @@ abstract class BaseIndex implements TntSearchIndexInterface
         return $indexFileName;
     }
 
-    /**
-     * @return void
-     */
     public function index(): void
     {
         if (!$this->isTranslatable()) {
@@ -69,10 +53,6 @@ abstract class BaseIndex implements TntSearchIndexInterface
         $this->indexTranslatableIndexes();
     }
 
-    /**
-     * @param string|null $locale
-     * @return void
-     */
     protected function indexOneIndex(string $locale = null): void
     {
         $indexFileName = $this->getIndexFileName($locale);
@@ -102,9 +82,6 @@ abstract class BaseIndex implements TntSearchIndexInterface
         }
     }
 
-    /**
-     * @return void
-     */
     protected function indexTranslatableIndexes(): void
     {
         $langs = LangQuery::create()

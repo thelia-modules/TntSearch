@@ -3,7 +3,6 @@
 namespace TntSearch\Service\Support;
 
 use Exception;
-use TntSearch\Service\Support\TntIndexer;
 use TeamTNT\TNTSearch\Exceptions\IndexNotFoundException;
 use TeamTNT\TNTSearch\TNTSearch as BaseTNTSearch;
 
@@ -30,19 +29,12 @@ class TntSearch extends BaseTNTSearch
 
     /**
      * Force stop word on every tokenisation
-     *
-     * @param $text
-     * @return array
      */
     public function breakIntoTokens($text): array
     {
         return $this->tokenizer->tokenize($text, $this->stopWords);
     }
 
-    /**
-     * @param array $stopWords
-     * @return void
-     */
     public function setStopWords(array $stopWords): void
     {
         $this->stopWords = $stopWords;
@@ -50,11 +42,6 @@ class TntSearch extends BaseTNTSearch
 
     /**
      * Need to instantiate our TntIndexer.
-     *
-     * @param string $indexName
-     * @param boolean $disableOutput
-     *
-     * @return TNTIndexer
      */
     public function createIndex($indexName, $disableOutput = false): TNTIndexer
     {
@@ -74,7 +61,6 @@ class TntSearch extends BaseTNTSearch
     /**
      * Need to instantiate our TntIndexer and set our connector.
      *
-     * @return TNTIndexer
      * @throws Exception
      */
     public function getIndex(): TNTIndexer
@@ -85,6 +71,7 @@ class TntSearch extends BaseTNTSearch
         $indexer->setIndex($this->index);
         $indexer->setStemmer($this->stemmer);
         $indexer->setTokenizer($this->tokenizer);
+        $indexer->loadConfig($this->config);
 
         $connector = $indexer->createConnector($this->config);
         $this->dbh = $connector->connect($this->config);
@@ -97,11 +84,6 @@ class TntSearch extends BaseTNTSearch
     /**
      * Allow a kind of results pagination using offset and limit.
      *
-     * @param string $search
-     * @param string $index
-     * @param int $offset
-     * @param int $limit
-     * @return array
      * @throws IndexNotFoundException
      */
     public function searchAndPaginate(string $search, string $index, int $offset = 0, int $limit = 100): array

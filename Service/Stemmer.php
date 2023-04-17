@@ -18,16 +18,8 @@ class Stemmer
         'ru_RU' => \TeamTNT\TNTSearch\Stemmer\RussianStemmer::class,
     ];
 
-    public function __construct(
-        protected EventDispatcherInterface $dispatcher
-    )
-    {
-    }
+    public function __construct(protected EventDispatcherInterface $dispatcher) {}
 
-    /**
-     * @param string|null $locale
-     * @return string
-     */
     public function getStemmer(string $locale = null): string
     {
         $stemmerEvent = new StemmerEvent();

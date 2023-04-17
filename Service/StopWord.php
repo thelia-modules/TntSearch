@@ -7,14 +7,8 @@ use TntSearch\Event\StopWordEvent;
 
 class StopWord
 {
-    public function __construct(protected EventDispatcherInterface $dispatcher)
-    {
-    }
+    public function __construct(protected EventDispatcherInterface $dispatcher) {}
 
-    /**
-     * @param string|null $locale
-     * @return array
-     */
     public function getStopWords(string $locale = null): array
     {
         $event = new StopWordEvent();

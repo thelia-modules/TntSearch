@@ -20,15 +20,8 @@ class ItemIndexation
         protected IndexationProvider $indexationProvider,
         protected TntSearchProvider  $tntSearchProvider,
         protected EventDispatcherInterface $dispatcher
-    )
-    {
-    }
+    ) {}
 
-    /**
-     * @param int $itemId
-     * @param string $itemIndexType
-     * @return void
-     */
     public function indexOneItemOnIndexes(int $itemId, string $itemIndexType): void
     {
         $index = $this->indexationProvider->getIndex($itemIndexType);
@@ -57,11 +50,6 @@ class ItemIndexation
         }
     }
 
-    /**
-     * @param int $itemId
-     * @param string $itemIndexType
-     * @return void
-     */
     public function deleteItemOnIndexes(int $itemId, string $itemIndexType): void
     {
         $index = $this->indexationProvider->getIndex($itemIndexType);
@@ -72,7 +60,6 @@ class ItemIndexation
     }
 
     /**
-     * @param TntSearchIndexInterface $index
      * @return TNTIndexer[]
      */
     public function buildTNTIndexers(TntSearchIndexInterface $index): array

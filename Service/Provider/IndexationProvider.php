@@ -12,8 +12,6 @@ class IndexationProvider
     protected array $indexes;
 
     /**
-     * @param $index
-     * @return void
      * @throws ReflectionException
      */
     public function addIndex($index): void
@@ -24,9 +22,6 @@ class IndexationProvider
         $this->indexes[$indexType] = $index;
     }
 
-    /**
-     * @return void
-     */
     public function indexAll(): void
     {
         foreach ($this->indexes as $index) {
@@ -34,10 +29,6 @@ class IndexationProvider
         }
     }
 
-    /**
-     * @param string $indexType
-     * @return TntSearchIndexInterface
-     */
     public function getIndex(string $indexType): TntSearchIndexInterface
     {
         return $this->indexes[$indexType];
@@ -52,7 +43,6 @@ class IndexationProvider
     }
 
     /**
-     * @param array $indexTypes
      * @return TntSearchIndexInterface[]
      */
     public function findIndexes(array $indexTypes): array

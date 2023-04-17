@@ -71,7 +71,7 @@ class IndexUpdateListener implements EventSubscriberInterface
      */
     public function updateProductIndex(ProductEvent $event): void
     {
-        if ($event->hasProduct()) {
+        if ($event->getProduct()) {
             $deleteMode = $event instanceof ProductDeleteEvent;
 
             $this->itemIndexation->deleteItemOnIndexes($event->getProduct()->getId(), 'product');
@@ -88,7 +88,7 @@ class IndexUpdateListener implements EventSubscriberInterface
      */
     public function updateCategoryIndex(CategoryEvent $event): void
     {
-        if ($event->hasCategory()) {
+        if ($event->getCategory()) {
             $deleteMode = $event instanceof CategoryDeleteEvent;
 
             $this->itemIndexation->deleteItemOnIndexes($event->getCategory()->getId(), 'category');
@@ -105,7 +105,7 @@ class IndexUpdateListener implements EventSubscriberInterface
      */
     public function updateFolderIndex(FolderEvent $event): void
     {
-        if ($event->hasFolder()) {
+        if ($event->getFolder()) {
             $deleteMode = $event instanceof FolderDeleteEvent;
 
             $this->itemIndexation->deleteItemOnIndexes($event->getFolder()->getId(), 'folder');
@@ -122,7 +122,7 @@ class IndexUpdateListener implements EventSubscriberInterface
      */
     public function updateContentIndex(ContentEvent $event): void
     {
-        if ($event->hasContent()) {
+        if ($event->getContent()) {
             $deleteMode = $event instanceof ContentDeleteEvent;
 
             $this->itemIndexation->deleteItemOnIndexes($event->getContent()->getId(), 'content');
