@@ -32,7 +32,7 @@ class TntSearch extends BaseTNTSearch
      */
     public function breakIntoTokens($text): array
     {
-        return $this->tokenizer->tokenize($text, $this->stopWords);
+        return $this->tokenizer->tokenize($text, $this->stopWords,'search');
     }
 
     public function setStopWords(array $stopWords): void
