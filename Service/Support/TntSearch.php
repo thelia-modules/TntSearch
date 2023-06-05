@@ -43,9 +43,9 @@ class TntSearch extends BaseTNTSearch
     /**
      * Need to instantiate our TntIndexer.
      */
-    public function createIndex($indexName, $disableOutput = false): TNTIndexer
+    public function createIndex($indexName, $disableOutput = false): TntIndexer
     {
-        $indexer = new TNTIndexer;
+        $indexer = new TntIndexer;
 
         $indexer->loadConfig($this->config);
         $indexer->disableOutput = $disableOutput;
@@ -63,9 +63,9 @@ class TntSearch extends BaseTNTSearch
      *
      * @throws Exception
      */
-    public function getIndex(): TNTIndexer
+    public function getIndex(): TntIndexer
     {
-        $indexer = new TNTIndexer;
+        $indexer = new TntIndexer;
 
         $indexer->inMemory = false;
         $indexer->setIndex($this->index);
