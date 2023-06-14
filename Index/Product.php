@@ -8,6 +8,10 @@ use Thelia\Core\Translation\Translator;
 
 class Product extends BaseIndex
 {
+    const FIELD_WEIGHT = [
+        'title' => 10,
+    ];
+
     public function isTranslatable(): bool
     {
         return true;

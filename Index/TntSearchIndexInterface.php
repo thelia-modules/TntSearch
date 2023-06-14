@@ -4,6 +4,8 @@ namespace TntSearch\Index;
 
 interface TntSearchIndexInterface
 {
+    public function getFieldWeights(string $field): int;
+
     public function isTranslatable(): bool;
 
     public function index(): void;
