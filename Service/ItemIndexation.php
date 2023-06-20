@@ -39,11 +39,15 @@ class ItemIndexation
 
                 $this->dispatcher->dispatch($extendQueryEvent, ExtendQueryEvent::EXTEND_QUERY . $indexName);
 
+                $tntIndexer->setIndexObject($index);
+
                 $tntIndexer->query($extendQueryEvent->getQuery());
                 $tntIndexer->run();
 
                 continue;
             }
+
+            $tntIndexer->setIndexObject($index);
 
             $tntIndexer->query($index->buildSqlQuery($itemId, $indexLocale));
             $tntIndexer->run();

@@ -2,6 +2,7 @@
 
 namespace TntSearch\Service\Support;
 
+use PDO;
 use TeamTNT\TNTSearch\Indexer\TNTIndexer as BaseTNTIndexer;
 use TntSearch\Connector\PropelConnector;
 use TntSearch\Index\TntSearchIndexInterface;
