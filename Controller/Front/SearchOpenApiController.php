@@ -6,10 +6,12 @@ use OpenApi\Annotations as OA;
 use OpenApi\Model\Api\ModelFactory;
 use OpenApi\Service\OpenApiService;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Model\Map\ContentTableMap;
+use TntSearch\Event\SaveRequestEvent;
 use TntSearch\Service\Search;
 
 /**
@@ -17,6 +19,10 @@ use TntSearch\Service\Search;
  */
 class SearchOpenApiController extends BaseFrontController
 {
+    public function __construct(protected EventDispatcherInterface $dispatcher)
+    {
+    }
+
     /**
      * @Route("", name="indexes_search", methods="GET")
      *
@@ -66,10 +72,13 @@ class SearchOpenApiController extends BaseFrontController
      */
     public function apiSearch(Search $search, Request $request, ModelFactory $modelFactory)
     {
+        $searchWords = $request->get('q');
+        $locale = $request->getSession()->getLang()->getLocale();
+
         $resultsByIndex = $search->search(
-            $request->get('q'),
+            $searchWords,
             ($index = $request->get('indexes')) ? explode(',', $index) : null,
-            $request->getSession()->getLang()->getLocale(),
+            $locale,
             $request->get('offset', 0),
             $request->get('limit', 100),
         );
@@ -95,6 +104,14 @@ class SearchOpenApiController extends BaseFrontController
             $data[$index] = array_map(function ($row) use ($index, $modelFactory) {
                 return $modelFactory->buildModel(ucwords($index), $row);
             }, iterator_to_array($rows));
+
+            if(!empty($data[$index])){
+                $event = new SaveRequestEvent();
+                $event->setLocale($locale)
+                    ->setIndex($index)
+                    ->setSearchWords($searchWords);
+                $this->dispatcher->dispatch($event, SaveRequestEvent::SAVE_REQUEST);
+            }
         }
 
         return OpenApiService::jsonResponse($data);
