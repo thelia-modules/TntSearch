@@ -74,6 +74,7 @@ class IndexUpdateListener implements EventSubscriberInterface
         if ($event->getProduct()) {
             $deleteMode = $event instanceof ProductDeleteEvent;
 
+
             $this->itemIndexation->deleteItemOnIndexes($event->getProduct()->getId(), 'product');
 
             if (!$deleteMode) {

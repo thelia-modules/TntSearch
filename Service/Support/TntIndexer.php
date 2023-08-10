@@ -2,18 +2,78 @@
 
 namespace TntSearch\Service\Support;
 
-use Propel\Runtime\Connection\PdoConnection;
+use PDO;
 use TeamTNT\TNTSearch\Indexer\TNTIndexer as BaseTNTIndexer;
 use TntSearch\Connector\PropelConnector;
+use TntSearch\Index\TntSearchIndexInterface;
 
 class TntIndexer extends BaseTNTIndexer
 {
+    protected TntSearchIndexInterface $indexObject;
+
     /**
      * Override tu use propel instance instead of dsn.
      */
     public function createConnector(array $config): PropelConnector
     {
         return new PropelConnector();
+    }
+
+    public function saveWordlist($stems): array
+    {
+        $terms = [];
+        $stems->map(function ($column, $key) use (&$terms) {
+            $weight = $this->indexObject->getFieldWeights($key);
+            foreach ($column as $term) {
+                if (array_key_exists($term, $terms)) {
+                    $terms[$term]['hits'] = (int) $terms[$term]['hits'] * $weight;
+                    $terms[$term]['docs'] = 1;
+                } else {
+                    $terms[$term] = [
+                        'hits' => 1 * $weight,
+                        'docs' => 1,
+                        'id' => 0
+                    ];
+                }
+            }
+        });
+
+        foreach ($terms as $key => $term) {
+            try {
+                $this->insertWordlistStmt->bindParam(":keyword", $key);
+                $this->insertWordlistStmt->bindParam(":hits", $term['hits']);
+                $this->insertWordlistStmt->bindParam(":docs", $term['docs']);
+                $this->insertWordlistStmt->execute();
+
+                $terms[$key]['id'] = $this->index->lastInsertId();
+                if ($this->inMemory) {
+                    $this->inMemoryTerms[$key] = $terms[$key]['id'];
+                }
+            } catch (\Exception $e) {
+                if ($e->getCode() == 23000) {
+                    $this->updateWordlistStmt->bindValue(':docs', $term['docs']);
+                    $this->updateWordlistStmt->bindValue(':hits', $term['hits']);
+                    $this->updateWordlistStmt->bindValue(':keyword', $key);
+                    $this->updateWordlistStmt->execute();
+                    if (!$this->inMemory) {
+                        $this->selectWordlistStmt->bindValue(':keyword', $key);
+                        $this->selectWordlistStmt->execute();
+                        $res = $this->selectWordlistStmt->fetch(PDO::FETCH_ASSOC);
+                        $terms[$key]['id'] = $res['id'];
+                    } else {
+                        $terms[$key]['id'] = $this->inMemoryTerms[$key];
+                    }
+                } else {
+                    echo "Error while saving wordlist: " . $e->getMessage() . "\n";
+                }
+
+                // Statements must be refreshed, because in this state they have error attached to them.
+                $this->statementsPrepared = false;
+                $this->prepareStatementsForIndex();
+
+            }
+        }
+        return $terms;
     }
 
     /**
@@ -27,28 +87,8 @@ class TntIndexer extends BaseTNTIndexer
         }
     }
 
-    public function processDocument($row)
+    public function setIndexObject(TntSearchIndexInterface $indexObject): void
     {
-        $documentId = $row->get($this->getPrimaryKey());
-
-        if ($this->excludePrimaryKey) {
-            $row->forget($this->getPrimaryKey());
-        }
-
-        $stems = $row->map(function ($columnContent, $columnName) use ($row) {
-            $this->columnName = $columnName;
-            return $this->stemText($columnContent);
-        });
-
-        $this->saveToIndex($stems, $documentId);
-    }
-
-    public function breakIntoTokens($text)
-    {
-        if ($this->decodeHTMLEntities) {
-            $text = html_entity_decode($text);
-        }
-
-        return $this->tokenizer->tokenize($text, $this->stopWords, $this->columnName);
+        $this->indexObject = $indexObject;
     }
 }

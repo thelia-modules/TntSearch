@@ -15,14 +15,26 @@ use TntSearch\Tokenizer\Tokenizer;
 
 abstract class BaseIndex implements TntSearchIndexInterface
 {
+    const FIELD_WEIGHT = [
+        'title' => 10,
+        'chapo' => 5
+    ];
+
     public function __construct(
         protected EventDispatcherInterface $disptacher,
         protected TntSearchProvider        $tntSearchProvider
-    ) {}
+    )
+    {
+    }
 
     public function getTokenizer(): string
     {
         return Tokenizer::class;
+    }
+
+    public function getFieldWeights($field): int
+    {
+        return self::FIELD_WEIGHT[$field] ?? 1;
     }
 
     public function getIndexName(): string
@@ -75,8 +87,11 @@ abstract class BaseIndex implements TntSearchIndexInterface
 
             $this->disptacher->dispatch($extendQueryEvent, ExtendQueryEvent::EXTEND_QUERY . $indexName);
 
+            $tntIndexer->setIndexObject($this);
+
             $tntIndexer->query($extendQueryEvent->getQuery());
             $tntIndexer->run();
+
         } catch (Exception $ex) {
             Tlog::getInstance()->addError("Error indexation on index $indexFileName : " . $ex->getMessage());
         }

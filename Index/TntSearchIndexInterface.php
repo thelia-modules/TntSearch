@@ -2,10 +2,10 @@
 
 namespace TntSearch\Index;
 
-use TeamTNT\TNTSearch\Indexer\TNTIndexer;
-
 interface TntSearchIndexInterface
 {
+    public function getFieldWeights(string $field): int;
+
     public function isTranslatable(): bool;
 
     public function index(): void;

@@ -5,7 +5,6 @@ namespace TntSearch\Service;
 use Exception;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use TeamTNT\TNTSearch\Indexer\TNTIndexer;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\LangQuery;
@@ -13,6 +12,7 @@ use TntSearch\Event\ExtendQueryEvent;
 use TntSearch\Index\TntSearchIndexInterface;
 use TntSearch\Service\Provider\IndexationProvider;
 use TntSearch\Service\Provider\TntSearchProvider;
+use TntSearch\Service\Support\TntIndexer;
 
 class ItemIndexation
 {
@@ -39,11 +39,15 @@ class ItemIndexation
 
                 $this->dispatcher->dispatch($extendQueryEvent, ExtendQueryEvent::EXTEND_QUERY . $indexName);
 
+                $tntIndexer->setIndexObject($index);
+
                 $tntIndexer->query($extendQueryEvent->getQuery());
                 $tntIndexer->run();
 
                 continue;
             }
+
+            $tntIndexer->setIndexObject($index);
 
             $tntIndexer->query($index->buildSqlQuery($itemId, $indexLocale));
             $tntIndexer->run();
@@ -60,7 +64,7 @@ class ItemIndexation
     }
 
     /**
-     * @return TNTIndexer[]
+     * @return TntIndexer[]
      */
     public function buildTNTIndexers(TntSearchIndexInterface $index): array
     {
