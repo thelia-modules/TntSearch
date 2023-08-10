@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<database defaultIdMethod="native" name="TheliaMain"
+<database defaultIdMethod="native" name="TheliaMain" namespace="TntSearch\Model"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="../../../core/vendor/thelia/propel/resources/xsd/database.xsd" >
-
+    <table name="tnt_search_log">
+        <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+        <column name="search_words" type="VARCHAR" size="255" />
+        <column name="index" type="VARCHAR" size="255" />
+        <column name="locale" type="VARCHAR" size="255" />
+        <column name="num_hits" type="INTEGER" />
+    </table>
 </database>
