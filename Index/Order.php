@@ -13,6 +13,7 @@ class Order extends BaseIndex
     {
         return '
             SELECT `order`.id AS id,
+            `order`.id AS order_id,
             `order`.ref AS ref,
             customer.ref AS customer_ref,
             customer.firstname AS firstname,

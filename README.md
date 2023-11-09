@@ -6,17 +6,12 @@ The module could be used in front-office, using the dedicated loop. It also repl
 
 ## Installation
 
-### Manually
-
-* Copy the module into ```<thelia_root>/local/modules/``` directory and be sure that the name of the module is TntSearch.
-* Activate it in your thelia administration panel
-
 ### Composer
 
 Add it in your main thelia composer.json file
 
 ```
-composer require thelia/tnt-search-module:~0.6.1
+composer require thelia/tnt-search-module:~2.0
 ```
 
 ## Configuration
