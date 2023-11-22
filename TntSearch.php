@@ -5,6 +5,7 @@ namespace TntSearch;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ServicesConfigurator;
+use Thelia\Install\Database;
 use Thelia\Module\BaseModule;
 use TntSearch\CompilerPass\IndexPass;
 use TntSearch\Index\BaseIndex;
@@ -23,6 +24,12 @@ class TntSearch extends BaseModule
     public function postActivation(ConnectionInterface $con = null): void
     {
         self::setConfigValue(self::ON_THE_FLY_UPDATE, false);
+        if (!self::getConfigValue('is_initialized', false)) {
+            $database = new Database($con);
+            $database->insertSql(null, [__DIR__.'/Config/TheliaMain.sql']);
+            self::setConfigValue('is_initialized', true);
+        }
+
     }
 
     public function update($currentVersion, $newVersion, ConnectionInterface $con = null): void
