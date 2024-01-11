@@ -26,7 +26,7 @@ class Product extends BaseIndex
         $query = 'SELECT product.id AS id, 
         product.id AS product_id,
         product.ref AS ref,
-        pse.ref AS pse_ref,
+        GROUP_CONCAT(DISTINCT(pse.ref)) AS pse_ref,
         GROUP_CONCAT(DISTINCT(pse.ean_code)) AS ean_codes,
         GROUP_CONCAT(DISTINCT(fai.title)) AS features,
         GROUP_CONCAT(DISTINCT(aavi.title)) AS attributes,
