@@ -26,7 +26,7 @@ class Product extends BaseIndex
         $query = 'SELECT product.id AS id, 
         product.id AS product_id,
         product.ref AS ref,
-        pse.ref AS pse_ref,
+        GROUP_CONCAT(DISTINCT(pse.ref)) AS pse_ref,
         GROUP_CONCAT(DISTINCT(pse.ean_code)) AS ean_codes,
         GROUP_CONCAT(DISTINCT(fai.title)) AS features,
         GROUP_CONCAT(DISTINCT(aavi.title)) AS attributes,
@@ -47,7 +47,8 @@ class Product extends BaseIndex
         LEFT JOIN attribute_av AS aav ON aav.id = ac.`attribute_av_id`
         LEFT JOIN attribute_av_i18n AS aavi ON aav.id = aavi.id AND aavi.locale=\'' . $locale . '\'
 
-        WHERE pi.locale=\'' . $locale . '\'';
+        WHERE product.visible = 1
+        AND pi.locale=\'' . $locale . '\'';
 
         if ($itemId) {
             $query .= ' AND product.id=' . $itemId;
