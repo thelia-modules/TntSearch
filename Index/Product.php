@@ -47,8 +47,7 @@ class Product extends BaseIndex
         LEFT JOIN attribute_av AS aav ON aav.id = ac.`attribute_av_id`
         LEFT JOIN attribute_av_i18n AS aavi ON aav.id = aavi.id AND aavi.locale=\'' . $locale . '\'
 
-        WHERE product.visible = 1
-        AND pi.locale=\'' . $locale . '\'';
+        WHERE pi.locale=\'' . $locale . '\'';
 
         if ($itemId) {
             $query .= ' AND product.id=' . $itemId;
