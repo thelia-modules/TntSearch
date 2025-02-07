@@ -27,29 +27,25 @@ class ItemIndexation
         $index = $this->indexationProvider->getIndex($itemIndexType);
 
         foreach ($this->buildTNTIndexers($index) as $indexLocale => $tntIndexer) {
+            $indexName = $index->getIndexName();
+
             if (!$index->isTranslatable()) {
-                $indexName = $index->getIndexName();
                 $query = $index->buildSqlQuery($itemId);
-
-                $extendQueryEvent = new ExtendQueryEvent();
-                $extendQueryEvent
-                    ->setQuery($query)
-                    ->setItemId(null)
-                    ->setItemType($indexName);
-
-                $this->dispatcher->dispatch($extendQueryEvent, ExtendQueryEvent::EXTEND_QUERY . $indexName);
-
-                $tntIndexer->setIndexObject($index);
-
-                $tntIndexer->query($extendQueryEvent->getQuery());
-                $tntIndexer->run();
-
-                continue;
+            } else {
+                $query = $index->buildSqlQuery($itemId, $indexLocale);
             }
 
             $tntIndexer->setIndexObject($index);
 
-            $tntIndexer->query($index->buildSqlQuery($itemId, $indexLocale));
+            $extendQueryEvent = new ExtendQueryEvent();
+            $extendQueryEvent
+                ->setQuery($query)
+                ->setItemType($indexName)
+                ->setItemId($itemId);
+
+            $this->dispatcher->dispatch($extendQueryEvent, ExtendQueryEvent::EXTEND_QUERY . $indexName);
+
+            $tntIndexer->query($extendQueryEvent->getQuery());
             $tntIndexer->run();
         }
     }
