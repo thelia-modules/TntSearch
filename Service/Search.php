@@ -14,10 +14,12 @@ class Search
     public function __construct(
         protected IndexationProvider $indexationProvider,
         protected TntSearchProvider  $tntSearchProvider
-    ) {}
+    )
+    {
+    }
 
     public function search(
-        string $searchWords,
+        string  $searchWords,
         ?array  $indexes,
         ?string $locale,
         ?int    $offset,
@@ -26,7 +28,7 @@ class Search
     {
         $result = [];
 
-        $indexlist = $indexes ? $this->indexationProvider->findIndexes($indexes): $this->indexationProvider->getIndexes();
+        $indexlist = $indexes ? $this->indexationProvider->findIndexes($indexes) : $this->indexationProvider->getIndexes();
 
         foreach ($indexlist as $index) {
             try {
@@ -56,16 +58,48 @@ class Search
         return $result;
     }
 
+    public function geoSearch(
+        float $latitude,
+        float $longitude,
+        float $radius = 10,
+        array $indexes = [],
+        ?int  $limit = 10,
+    ): array
+    {
+        $result = [];
+
+        $indexlist = $indexes ? $this->indexationProvider->findIndexes($indexes) : $this->indexationProvider->getIndexes();
+
+        foreach ($indexlist as $index) {
+            try {
+                if (!$index->isGeoIndexable()) {
+                    continue;
+                }
+                $geoSearch = $this->tntSearchProvider->getGeoTntSearch($index->getIndexFileName(null , true));
+                $result = $geoSearch->findNearest([
+                    'longitude' => $longitude,
+                    'latitude' => $latitude
+                ], $radius, $limit);
+
+            } catch (Exception $ex) {
+                Tlog::getInstance()->addError('Error on TntSearch search ' . $ex->getMessage());
+                continue;
+            }
+        }
+
+        return $result;
+    }
+
     public function buildPropelQueryFromIndex(string $indexName): ModelCriteria
     {
         /** @var ModelCriteria $modelQuery */
-        $modelQuery = 'Thelia\\Model\\'.ucwords($indexName) . 'Query';
+        $modelQuery = 'Thelia\\Model\\' . ucwords($indexName) . 'Query';
 
         return $modelQuery::create();
     }
 
     public function buildPropelTableMapFromIndex(string $indexName): string
     {
-        return 'Thelia\\Model\\Map\\'.ucwords($indexName) . 'TableMap';
+        return 'Thelia\\Model\\Map\\' . ucwords($indexName) . 'TableMap';
     }
 }
