@@ -8,7 +8,9 @@ interface TntSearchIndexInterface
 
     public function isTranslatable(): bool;
 
-    public function index(): void;
+    public function isGeoIndexable(): bool;
 
     public function buildSqlQuery(int $itemId = null, string $locale = null): string;
+
+    public function buildSqlGeoQuery(int $itemId = null): ?string;
 }

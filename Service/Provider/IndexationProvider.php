@@ -4,11 +4,14 @@ namespace TntSearch\Service\Provider;
 
 use ReflectionClass;
 use ReflectionException;
+use Symfony\Component\Console\Output\OutputInterface;
+use Thelia\Log\Tlog;
+use TntSearch\Index\BaseIndex;
 use TntSearch\Index\TntSearchIndexInterface;
 
 class IndexationProvider
 {
-    /** @var TntSearchIndexInterface[] */
+    /** @var BaseIndex[] */
     protected array $indexes;
 
     /**
@@ -22,10 +25,17 @@ class IndexationProvider
         $this->indexes[$indexType] = $index;
     }
 
-    public function indexAll(): void
+    public function indexAll(?OutputInterface $output = null): void
     {
         foreach ($this->indexes as $index) {
-            $index->index();
+            try {
+                $output?->write('<info>' . $index::class . ' </info>');
+
+                $index->index();
+            } catch (\Exception $e) {
+                $output?->write('<error>' . $e->getMessage() . '</error>');
+                Tlog::getInstance()->addError('Error on TntSearch indexation ' . $e->getMessage());
+            }
         }
     }
 
