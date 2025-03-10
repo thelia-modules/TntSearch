@@ -21,7 +21,7 @@ abstract class BaseIndex implements TntSearchIndexInterface
     ];
 
     public function __construct(
-        protected EventDispatcherInterface $disptacher,
+        protected EventDispatcherInterface $dispatcher,
         protected TntSearchProvider        $tntSearchProvider
     )
     {
@@ -43,7 +43,7 @@ abstract class BaseIndex implements TntSearchIndexInterface
         return strtolower($reflectionClass->getShortName());
     }
 
-    public function getIndexFileName(string $locale = null): string
+    public function getIndexFileName(string $locale = null, bool $isGeo = false): string
     {
         $indexName = $this->getIndexName();
         $indexFileName = $this->getIndexName() . '.index';
@@ -52,17 +52,45 @@ abstract class BaseIndex implements TntSearchIndexInterface
             $indexFileName = $indexName . '_' . $locale . '.index';
         }
 
+        if ($isGeo) {
+            $indexFileName = $indexName . '_geo.index';
+        }
+
+
         return $indexFileName;
     }
 
+    /**
+     * @throws Exception
+     */
     public function index(): void
     {
+        if ($this->isGeoIndexable()) {
+            $this->geoIndex();
+        }
+
         if (!$this->isTranslatable()) {
             $this->indexOneIndex();
             return;
         }
 
         $this->indexTranslatableIndexes();
+    }
+
+    /**
+     * @throws Exception
+     */
+    protected function geoIndex(): void
+    {
+        $geoIndexer = $this->tntSearchProvider->getGeoTntIndexer();
+
+        if (!$query = $this->buildSqlGeoQuery()) {
+            throw new Exception("No query found for geo indexation");
+        }
+
+        $geoIndexer->createIndex($this->getIndexFileName(null, true));
+        $geoIndexer->query($query);
+        $geoIndexer->run();
     }
 
     protected function indexOneIndex(string $locale = null): void
@@ -85,7 +113,7 @@ abstract class BaseIndex implements TntSearchIndexInterface
                 ->setItemId(null)
                 ->setItemType($indexName);
 
-            $this->disptacher->dispatch($extendQueryEvent, ExtendQueryEvent::EXTEND_QUERY . $indexName);
+            $this->dispatcher->dispatch($extendQueryEvent, ExtendQueryEvent::EXTEND_QUERY . $indexName);
 
             $tntIndexer->setIndexObject($this);
 
@@ -107,5 +135,15 @@ abstract class BaseIndex implements TntSearchIndexInterface
         foreach ($langs as $lang) {
             $this->indexOneIndex($lang->getLocale());
         }
+    }
+
+    public function isGeoIndexable(): bool
+    {
+        return false;
+    }
+
+    public function buildSqlGeoQuery(int $itemId = null): ?string
+    {
+        return null;
     }
 }
