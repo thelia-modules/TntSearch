@@ -111,6 +111,7 @@ abstract class BaseIndex implements TntSearchIndexInterface
             $extendQueryEvent
                 ->setQuery($query)
                 ->setItemId(null)
+                ->setLocale($locale)
                 ->setItemType($indexName);
 
             $this->dispatcher->dispatch($extendQueryEvent, ExtendQueryEvent::EXTEND_QUERY . $indexName);
