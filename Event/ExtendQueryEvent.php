@@ -11,6 +11,7 @@ class ExtendQueryEvent extends ActionEvent
     protected string $itemType;
     protected ?int $itemId;
     protected string $query;
+    protected ?string $locale;
 
     /**
      * @return string
@@ -63,6 +64,18 @@ class ExtendQueryEvent extends ActionEvent
     public function setQuery(string $query): ExtendQueryEvent
     {
         $this->query = $query;
+        return $this;
+    }
+
+    public function getLocale(): ?string
+    {
+        return $this->locale;
+    }
+
+    public function setLocale(?string $locale): ExtendQueryEvent
+    {
+        $this->locale = $locale;
+
         return $this;
     }
 }

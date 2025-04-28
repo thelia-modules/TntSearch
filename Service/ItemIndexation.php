@@ -41,6 +41,7 @@ class ItemIndexation
             $extendQueryEvent
                 ->setQuery($query)
                 ->setItemType($indexName)
+                ->setLocale($indexLocale)
                 ->setItemId($itemId);
 
             $this->dispatcher->dispatch($extendQueryEvent, ExtendQueryEvent::EXTEND_QUERY . $indexName);
