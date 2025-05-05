@@ -12,4 +12,23 @@ class TntGeoIndexer extends BaseTNTGeoIndexer
         parent::__construct();
         $this->dbh = (new PropelConnector())->connect($this->config);
     }
+
+    /**
+     * Override tu use propel instance instead of dsn.
+     */
+    public function createConnector(array $config): PropelConnector
+    {
+        return new PropelConnector();
+    }
+
+    /**
+     * Allow to handle PDOConnection from propel.
+     */
+    public function setDatabasePropelConnector($dbh): void
+    {
+        $this->dbh = $dbh;
+        if ($this->dbh->getAttribute(\PDO::ATTR_DRIVER_NAME) == 'mysql') {
+            $this->dbh->setAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
+        }
+    }
 }
