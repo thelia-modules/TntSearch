@@ -34,6 +34,9 @@ class ItemIndexation
             } else {
                 $query = $index->buildSqlQuery($itemId, $indexLocale);
             }
+            if ($index->isGeoIndexable() && $indexLocale === "geo") {
+                $query = $index->buildSqlGeoQuery($itemId);
+            }
 
             $tntIndexer->setIndexObject($index);
 
@@ -41,7 +44,6 @@ class ItemIndexation
             $extendQueryEvent
                 ->setQuery($query)
                 ->setItemType($indexName)
-                ->setLocale($indexLocale)
                 ->setItemId($itemId);
 
             $this->dispatcher->dispatch($extendQueryEvent, ExtendQueryEvent::EXTEND_QUERY . $indexName);
@@ -67,6 +69,17 @@ class ItemIndexation
     {
         $tntIndexers = [];
 
+
+        if ($index->isGeoIndexable()) {
+            $indexFileName = $index->getIndexFileName(null, true);
+            try {
+                $tntState = $this->tntSearchProvider->getGeoTntSearch($indexFileName);
+                $tntIndexers['geo'] = $tntState->getIndex();
+
+            } catch (Exception $ex) {
+                Tlog::getInstance()->addError("Error on $indexFileName index update : " . $ex->getMessage());
+            }
+        }
         if (!$index->isTranslatable()) {
             $indexFileName = $index->getIndexFileName();
 
