@@ -3,7 +3,7 @@
 namespace TntSearch\Service\Provider;
 
 use Symfony\Component\Filesystem\Filesystem;
-use TeamTNT\TNTSearch\TNTGeoSearch;
+use TntSearch\Service\Support\TNTGeoSearch;
 use TntSearch\Service\Stemmer;
 use TntSearch\Service\StopWord;
 use TntSearch\Service\Support\TntGeoIndexer;
@@ -55,6 +55,7 @@ class TntSearchProvider
 
         return $tnt;
     }
+
 
     protected function getConfigs(?string $stemmer = null, ?string $tokenizer = null): array
     {
