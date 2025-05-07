@@ -12,6 +12,7 @@ use TntSearch\Event\ExtendQueryEvent;
 use TntSearch\Index\TntSearchIndexInterface;
 use TntSearch\Service\Provider\IndexationProvider;
 use TntSearch\Service\Provider\TntSearchProvider;
+use TntSearch\Service\Support\TntGeoIndexer;
 use TntSearch\Service\Support\TntIndexer;
 
 class ItemIndexation
@@ -34,14 +35,18 @@ class ItemIndexation
             } else {
                 $query = $index->buildSqlQuery($itemId, $indexLocale);
             }
+            if ($index->isGeoIndexable() && $indexLocale === "geo") {
+                $query = $index->buildSqlGeoQuery($itemId);
+            }
 
-            $tntIndexer->setIndexObject($index);
+            if ($tntIndexer instanceof TntIndexer){
+                $tntIndexer->setIndexObject($index);
+            }
 
             $extendQueryEvent = new ExtendQueryEvent();
             $extendQueryEvent
                 ->setQuery($query)
                 ->setItemType($indexName)
-                ->setLocale($indexLocale)
                 ->setItemId($itemId);
 
             $this->dispatcher->dispatch($extendQueryEvent, ExtendQueryEvent::EXTEND_QUERY . $indexName);
@@ -55,8 +60,12 @@ class ItemIndexation
     {
         $index = $this->indexationProvider->getIndex($itemIndexType);
 
-        foreach ($this->buildTNTIndexers($index) as $tNTIndexer) {
-            $tNTIndexer->delete($itemId);
+        foreach ($this->buildTNTIndexers($index) as $TNTIndexer) {
+            if($TNTIndexer instanceof TNTIndexer){
+                $TNTIndexer->delete($itemId);
+                continue;
+            }
+            $this->deleteGeoIndex(documentId: $itemId,tntIndexer: $TNTIndexer);
         }
     }
 
@@ -67,6 +76,17 @@ class ItemIndexation
     {
         $tntIndexers = [];
 
+
+        if ($index->isGeoIndexable()) {
+            $indexFileName = $index->getIndexFileName(null, true);
+            try {
+                $tntState = $this->tntSearchProvider->getGeoTntSearch($indexFileName);
+                $tntIndexers['geo'] = $tntState->getIndex();
+
+            } catch (Exception $ex) {
+                Tlog::getInstance()->addError("Error on $indexFileName index update : " . $ex->getMessage());
+            }
+        }
         if (!$index->isTranslatable()) {
             $indexFileName = $index->getIndexFileName();
 
@@ -104,5 +124,13 @@ class ItemIndexation
         }
 
         return $tntIndexers;
+    }
+
+    //missing this method because we have an old version see https://github.com/teamtnt/tntsearch/blob/3f6078c37d55feab3927d8f988f9e1e8b3aaa2a0/src/Indexer/TNTGeoIndexer.php#L80
+    public function deleteGeoIndex($documentId,TntGeoIndexer $tntIndexer): void
+    {
+        $tntIndexer->prepareAndExecuteStatement("DELETE FROM locations WHERE doc_id = :documentId;", [
+            ['key' => ':documentId', 'value' => $documentId]
+        ]);
     }
 }
