@@ -76,7 +76,6 @@ class ItemIndexation
     {
         $tntIndexers = [];
 
-
         if ($index->isGeoIndexable()) {
             $indexFileName = $index->getIndexFileName(null, true);
             try {
@@ -87,6 +86,7 @@ class ItemIndexation
                 Tlog::getInstance()->addError("Error on $indexFileName index update : " . $ex->getMessage());
             }
         }
+
         if (!$index->isTranslatable()) {
             $indexFileName = $index->getIndexFileName();
 

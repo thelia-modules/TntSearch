@@ -10,6 +10,7 @@ use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\LangQuery;
 use TntSearch\Event\ExtendQueryEvent;
+use TntSearch\Event\WeightEvent;
 use TntSearch\Service\Provider\TntSearchProvider;
 use TntSearch\Tokenizer\Tokenizer;
 
@@ -34,7 +35,12 @@ abstract class BaseIndex implements TntSearchIndexInterface
 
     public function getFieldWeights($field): int
     {
-        return self::FIELD_WEIGHT[$field] ?? 1;
+        $weightEvent = new WeightEvent();
+        $weightEvent->setFieldWeights(self::FIELD_WEIGHT);
+
+        $this->dispatcher->dispatch($weightEvent, WeightEvent::WEIGHT . $this->getIndexName());
+
+        return $weightEvent->getFieldWeight($field);
     }
 
     public function getIndexName(): string

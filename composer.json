@@ -5,7 +5,7 @@
   "require": {
     "ext-json": "*",
     "thelia/installer": "~1.1",
-    "teamtnt/tntsearch": "2.*"
+    "teamtnt/tntsearch": "~5.0.0"
   },
   "extra": {
     "installer-name": "TntSearch"

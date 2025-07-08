@@ -3,8 +3,10 @@
 namespace TntSearch\Service\Support;
 
 use Exception;
+use TeamTNT\TNTSearch\Engines\EngineInterface;
 use TeamTNT\TNTSearch\Exceptions\IndexNotFoundException;
 use TeamTNT\TNTSearch\TNTSearch as BaseTNTSearch;
+use TntSearch\Engine\PropelEngine;
 
 
 /**
@@ -45,17 +47,19 @@ class TntSearch extends BaseTNTSearch
      */
     public function createIndex($indexName, $disableOutput = false): TntIndexer
     {
-        $indexer = new TntIndexer;
+        $indexer = new TntIndexer(new PropelEngine());
 
         $indexer->loadConfig($this->config);
-        $indexer->disableOutput = $disableOutput;
 
         $indexer->setStopWords($this->stopWords);
 
         if ($this->dbh) {
             $indexer->setDatabaseHandle($this->dbh);
         }
-        return $indexer->createIndex($indexName);
+
+        $indexer->createIndex($indexName);
+
+        return $indexer;
     }
 
     /**
@@ -65,9 +69,8 @@ class TntSearch extends BaseTNTSearch
      */
     public function getIndex(): TntIndexer
     {
-        $indexer = new TntIndexer;
+        $indexer = new TntIndexer(new PropelEngine());
 
-        $indexer->inMemory = false;
         $indexer->setIndex($this->index);
         $indexer->setStemmer($this->stemmer);
         $indexer->setTokenizer($this->tokenizer);
@@ -89,10 +92,11 @@ class TntSearch extends BaseTNTSearch
     public function searchAndPaginate(string $search, string $index, int $offset = 0, int $limit = 100): array
     {
         $searchLimit = $limit + $offset;
+        $tokens = $this->breakIntoTokens($search);
 
         $this->selectIndex($index);
 
-        $result = $this->search($search, $searchLimit)['ids'];
+        $result = $this->searchBoolean(implode(' ', $tokens), $searchLimit)['ids'];
 
         if ($offset === 0) {
             return $result;
