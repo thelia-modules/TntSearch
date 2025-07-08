@@ -9,12 +9,10 @@ class TNTGeoSearch extends BaseTNTGeoSearch
     /**
      * Need to instantiate our TntGeoIndexer and set our connector.
      *
-     * @throws Exception
      */
-    public function getIndex()
+    public function getIndex(): TntGeoIndexer
     {
         $indexer           = new TntGeoIndexer;
-        $indexer->inMemory = false;
         $indexer->setIndex($this->index);
         $indexer->loadConfig($this->config);
 
@@ -35,7 +33,6 @@ class TNTGeoSearch extends BaseTNTGeoSearch
         $indexer = new TntGeoIndexer;
 
         $indexer->loadConfig($this->config);
-        $indexer->disableOutput = $disableOutput;
 
         if ($this->dbh) {
             $indexer->setDatabaseHandle($this->dbh);

@@ -5,8 +5,9 @@ namespace TntSearch\Connector;
 use Propel\Runtime\Connection\PdoConnection;
 use Propel\Runtime\Propel;
 use TeamTNT\TNTSearch\Connectors\Connector;
+use TeamTNT\TNTSearch\Connectors\ConnectorInterface;
 
-class PropelConnector extends Connector
+class PropelConnector extends Connector implements ConnectorInterface
 {
     /**
      * Establish a database connection to use propel
