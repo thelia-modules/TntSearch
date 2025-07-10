@@ -3,6 +3,7 @@
 namespace TntSearch\Engine;
 
 use TeamTNT\TNTSearch\Engines\SqliteEngine;
+use TeamTNT\TNTSearch\Support\Collection;
 use TntSearch\Connector\PropelConnector;
 use TntSearch\Index\TntSearchIndexInterface;
 
@@ -19,37 +20,42 @@ class PropelEngine extends SqliteEngine
         return new PropelConnector;
     }
 
-    public function saveWordlist($stems): array
+    public function saveWordlist(Collection $stems)
     {
         $terms = [];
         $stems->map(function ($column, $key) use (&$terms) {
             $weight = $this->indexObject->getFieldWeights($key);
             foreach ($column as $term) {
                 if (array_key_exists($term, $terms)) {
-                    $terms[$term]['hits'] = (int) $terms[$term]['hits'] * $weight;
+                    $terms[$term]['hits'] += $weight;
                     $terms[$term]['docs'] = 1;
                 } else {
                     $terms[$term] = [
-                        'hits' => 1 * $weight,
+                        'hits' => $weight,
                         'docs' => 1,
-                        'id' => 0
+                        'id' => 0,
                     ];
                 }
             }
         });
 
         foreach ($terms as $key => $term) {
+
             try {
                 $this->insertWordlistStmt->bindParam(":keyword", $key);
                 $this->insertWordlistStmt->bindParam(":hits", $term['hits']);
                 $this->insertWordlistStmt->bindParam(":docs", $term['docs']);
                 $this->insertWordlistStmt->execute();
 
-                $terms[$key]['id'] = $this->index->lastInsertId();
+                $lastInsertId = $this->index->query('SELECT MAX(id) FROM wordlist')->fetchColumn();
+                $terms[$key]['id'] = $lastInsertId;
+
                 if ($this->inMemory) {
                     $this->inMemoryTerms[$key] = $terms[$key]['id'];
                 }
+
             } catch (\Exception $e) {
+
                 if ($e->getCode() == 23000) {
                     $this->updateWordlistStmt->bindValue(':docs', $term['docs']);
                     $this->updateWordlistStmt->bindValue(':hits', $term['hits']);
@@ -73,6 +79,7 @@ class PropelEngine extends SqliteEngine
 
             }
         }
+
         return $terms;
     }
 }
