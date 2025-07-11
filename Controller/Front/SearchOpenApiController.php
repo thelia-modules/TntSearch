@@ -104,14 +104,6 @@ class SearchOpenApiController extends BaseFrontController
             $data[$index] = array_map(function ($row) use ($index, $modelFactory) {
                 return $modelFactory->buildModel(ucwords($index), $row);
             }, iterator_to_array($rows));
-
-            if(!empty($data[$index])){
-                $event = new SaveRequestEvent();
-                $event->setLocale($locale)
-                    ->setIndex($index)
-                    ->setSearchWords($searchWords);
-                $this->dispatcher->dispatch($event, SaveRequestEvent::SAVE_REQUEST);
-            }
         }
 
         return OpenApiService::jsonResponse($data);

@@ -5,6 +5,7 @@ namespace TntSearch;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ServicesConfigurator;
+use Symfony\Component\Finder\Finder;
 use Thelia\Install\Database;
 use Thelia\Module\BaseModule;
 use TntSearch\CompilerPass\IndexPass;
@@ -36,6 +37,21 @@ class TntSearch extends BaseModule
     {
         if (version_compare($currentVersion, '0.7.0') === -1) {
             self::setConfigValue(self::ON_THE_FLY_UPDATE, true);
+        }
+
+        $finder = Finder::create()
+            ->name('*.sql')
+            ->depth(0)
+            ->sortByName()
+            ->in(__DIR__ . DS . 'Config' . DS . 'update');
+
+        $database = new Database($con);
+
+        /** @var \SplFileInfo $file */
+        foreach ($finder as $file) {
+            if (version_compare($currentVersion, $file->getBasename('.sql'), '<')) {
+                $database->insertSql(null, [$file->getPathname()]);
+            }
         }
     }
 

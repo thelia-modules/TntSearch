@@ -31,9 +31,9 @@ class LogSearchResultListener extends BaseAction implements EventSubscriberInter
             $entry->setSearchWords($event->getSearchWords())
                 ->setLocale($event->getLocale())
                 ->setIndex($event->getIndex())
-                ->setNumHits(0);
+                ->setNumHits($event->getHits());
         }
-        $entry->setNumHits($entry->getNumHits() + 1);
+        $entry->setNumHits($event->getHits());
         $entry->save();
         return  $entry;
     }

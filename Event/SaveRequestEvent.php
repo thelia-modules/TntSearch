@@ -7,15 +7,12 @@ use Thelia\Core\Event\ActionEvent;
 class SaveRequestEvent extends ActionEvent
 {
     const SAVE_REQUEST = 'action.tntsearch.save.request';
-
-    /** @var string */
     protected string $searchWords;
 
-    /** @var string */
     protected string $locale;
 
-    /** @var string */
     protected string $index;
+    protected int $hits;
 
     /**
      * @return array
@@ -71,6 +68,13 @@ class SaveRequestEvent extends ActionEvent
         return $this;
     }
 
+    public function getHits(): int
+    {
+        return $this->hits;
+    }
 
-
+    public function setHits(int $hits): void
+    {
+        $this->hits = $hits;
+    }
 }

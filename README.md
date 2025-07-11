@@ -1,80 +1,140 @@
-# TNT Search Module
+# TntSearch Module
 
-This module integrates TNTSearch, a full-featured full text search engine written in PHP, into Thelia. It works both in the front-office through a dedicated loop and replaces the standard back-office search functionality.
+## Description
 
+TntSearch est un module Symfony pour Thelia qui fournit un système de recherche avancé et performant. Il s'agit d'une implémentation basée sur la bibliothèque TNT Search pour offrir des fonctionnalités de recherche full-text rapides et efficaces.
+
+## Caractéristiques
+
+- **Recherche full-text** : Recherche rapide et précise dans le contenu
+- **Indexation automatique** : Index automatique des données pour des performances optimales
+- **Support multi-langue** : Gestion des recherches dans différentes langues
+- **Stemming** : Traitement linguistique pour améliorer la pertinence des résultats
+- **Stop words** : Filtrage des mots vides pour optimiser les recherches
+- **Logging des recherches** : Enregistrement des requêtes pour analyse
+
+## Structure du Module
 ## Installation
 
-Add it to your main Thelia composer.json file:
-
-```bash
-composer require thelia/tnt-search-module:~2.0
-```
+1. Placez le module dans le dossier `local/modules/TntSearch`
+2. Activez le module depuis l'administration Thelia
+3. Configurez les paramètres selon vos besoins
 
 ## Configuration
 
-Search indexes update automatically when products, categories, folders, content, brands, etc. are modified in the back-office. For faster back-office operations, you can disable real-time updates in the module configuration.
+### Fichiers de Configuration
 
-When real-time updates are disabled, you'll need to rebuild indexes manually:
-- Use the "Rebuild Indexes" button in the module configuration page
-- Set up a cron job with the command: `Thelia tntsearch:indexes`
+- `config.xml` : Configuration générale du module
+- `module.xml` : Métadonnées du module
+- `routing.xml` : Routes du module
+- `schema.xml` : Schéma de base de données
 
-## Thelia Loops
+### Base de Données
 
-### tnt-search loop
+Le module utilise plusieurs tables pour stocker :
+- Les index de recherche
+- Les logs de recherche
+- Les configurations
 
-Returns IDs of the elements matching your search criteria.
+## Utilisation
 
-#### Input arguments
+### Indexation
 
-| Argument | Description |
-|----------|-------------|
-| **search_for** | Elements to search for (`product`, `category`, `folder`, `content`, `brand`, `order` or `customer`) |
-| **locale** | Languages to search in (e.g., 'fr_FR, en_US') |
-| **search** | Search term |
+Le module indexe automatiquement :
+- **Produits** : Noms, descriptions, références
+- **Catégories** : Noms et descriptions
+- **Marques** : Informations sur les marques
+- **Contenus** : Pages et articles
+- **Clients** : Données clients (si activé)
+- **Commandes** : Informations de commande
 
-#### Output arguments
+### Recherche Front-Office
 
-| Variable | Description |
-|----------|-------------|
-| $PRODUCT | List of product IDs or 0 |
-| $CATEGORY | List of category IDs or 0 |
-| $BRAND | List of brand IDs or 0 |
-| $FOLDER | List of folder IDs or 0 |
-| $CONTENT | List of content IDs or 0 |
-| $CUSTOMER | List of customer IDs or 0 |
-| $ORDER | List of order IDs or 0 |
+La recherche est disponible via :
+- Interface de recherche standard
+- API REST pour intégrations personnalisées
+- Boucles Thelia pour templates
 
-#### Example
+### Administration
 
-To use this loop, combine it with another loop:
+L'interface d'administration permet :
+- Configuration des paramètres de recherche
+- Gestion des index
+- Consultation des logs de recherche
+- Réindexation manuelle
 
-```smarty
-{loop type="tnt-search" name="product-tnt-search-loop" search_for="product" locale="fr_FR" search=$search}
-    {loop type="product" name="product-loop" id=$PRODUCT order="given_id"}
-        Put your code here
-    {/loop}
-{/loop}
-```
+## API et Hooks
 
-The `order="given_id"` parameter is important to preserve the relevance order provided by TNTSearch.
+### Services Principaux
 
-## Custom Indexation
+- `ItemIndexation` : Service d'indexation
+- `Search` : Service de recherche
+- `Stemmer` : Service de stemming
+- `StopWord` : Gestion des mots vides
 
-To implement custom indexation, create a class implementing `TntSearchIndexInterface` and register it as a service with the `tntsearch.base.index` parent.
+### Événements
 
-### TntSearchIndexInterface
+- `ExtendQueryEvent` : Extension des requêtes
+- `SaveRequestEvent` : Sauvegarde des requêtes
+- `StemmerEvent` : Traitement de stemming
+- `StopWordEvent` : Filtrage des mots vides
+- `WeightEvent` : Calcul des poids
 
-If you want to create your own index, implement this interface which requires the following methods:
+## Commandes Console
 
-| Method | Description |
-|--------|-------------|
-| `getFieldWeights(string $field)` | Returns the weight for a given field (integer). Higher values give more importance to matches in this field. |
-| `isTranslatable()` | Returns whether the indexed content has translations (boolean). |
-| `isGeoIndexable()` | Returns whether the index supports geolocation search features (boolean). |
-| `buildSqlQuery(int $itemId = null, string $locale = null)` | Returns the SQL query used to retrieve the data to index. Can be filtered by ID and locale. |
-| `buildSqlGeoQuery(int $itemId = null)` | Returns the SQL query for geolocation data (or null if not applicable). |
+Le module fournit des commandes pour :
+- Réindexation complète
+- Nettoyage des index
+- Optimisation des performances
 
-### Service Configuration
+## Performances
 
-Register your custom index as a service by extending the `tntsearch.base.index`.
-This will automatically register your index with the TNTSearch indexation provider system.
+### Index Stockés
+
+Les index sont stockés dans `local/TNTIndexes/` :
+- `brand_fr_FR.index`
+- `category_fr_FR.index`
+- `content_fr_FR.index`
+- `customer.index`
+- `folder_fr_FR.index`
+- `order.index`
+- `product_fr_FR.index`
+
+### Optimisations
+
+- Index pré-calculés pour des recherches rapides
+- Cache des résultats fréquents
+- Tokenisation efficace du texte
+- Algorithmes de stemming optimisés
+- Recherche par phrase
+
+## Compatibilité
+
+- **Thelia** : Version 2.5+
+
+## Support Multi-langue
+
+Le module supporte nativement :
+- Français (fr_FR)
+- Autres langues via configuration
+
+## Maintenance
+
+### Tâches Régulières
+
+- Réindexation périodique
+- Nettoyage des logs anciens
+- Optimisation des index
+- Surveillance des performances
+
+### Dépannage
+
+- Vérification des permissions sur les fichiers d'index
+- Contrôle de l'espace disque
+- Analyse des logs d'erreur
+
+## Licence
+
+Ce module est distribué sous licence compatible avec Thelia.
+
+## Support

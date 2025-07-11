@@ -4,8 +4,10 @@ namespace TntSearch\Service;
 
 use Exception;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use TeamTNT\TNTSearch\Exceptions\IndexNotFoundException;
 use Thelia\Log\Tlog;
+use TntSearch\Event\SaveRequestEvent;
 use TntSearch\Service\Provider\IndexationProvider;
 use TntSearch\Service\Provider\TntSearchProvider;
 
@@ -13,7 +15,8 @@ class Search
 {
     public function __construct(
         protected IndexationProvider $indexationProvider,
-        protected TntSearchProvider  $tntSearchProvider
+        protected TntSearchProvider  $tntSearchProvider,
+        protected EventDispatcherInterface $dispatcher
     )
     {
     }
@@ -46,6 +49,16 @@ class Search
                     $offset,
                     $limit
                 );
+
+                $event = new SaveRequestEvent();
+                $event->setLocale($locale)
+                    ->setIndex($index->getIndexName())
+                    ->setSearchWords($searchWords)
+                ->setHits(count($result[$index->getIndexName()]));
+
+                $this->dispatcher->dispatch($event, SaveRequestEvent::SAVE_REQUEST);
+
+
             } catch (IndexNotFoundException $ex) {
                 Tlog::getInstance()->addError('Error index missing : ' . $ex->getMessage());
                 continue;
