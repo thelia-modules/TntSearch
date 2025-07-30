@@ -70,15 +70,15 @@ class TntSearch extends BaseTNTSearch
     public function getIndex(): TntIndexer
     {
         $indexer = new TntIndexer(new PropelEngine());
-
+        
+        $connector = $indexer->createConnector($this->config);
+        $this->dbh = $connector->connect($this->config);
+        
         $indexer->setIndex($this->index);
         $indexer->setStemmer($this->stemmer);
         $indexer->setTokenizer($this->tokenizer);
         $indexer->loadConfig($this->config);
-
-        $connector = $indexer->createConnector($this->config);
-        $this->dbh = $connector->connect($this->config);
-
+        
         $indexer->setDatabasePropelConnector($this->dbh);
 
         return $indexer;
