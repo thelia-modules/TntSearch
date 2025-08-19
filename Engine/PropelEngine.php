@@ -6,6 +6,7 @@ use TeamTNT\TNTSearch\Engines\SqliteEngine;
 use TeamTNT\TNTSearch\Support\Collection;
 use TntSearch\Connector\PropelConnector;
 use TntSearch\Index\TntSearchIndexInterface;
+use \PDO;
 
 class PropelEngine extends SqliteEngine
 {
@@ -18,6 +19,16 @@ class PropelEngine extends SqliteEngine
     public function createConnector(array $config): PropelConnector
     {
         return new PropelConnector;
+    }
+
+    public function loadConfig(array $config)
+    {
+        parent::loadConfig($config);
+
+        if (!$this->dbh) {
+            $connector = $this->createConnector($this->config);
+            $this->dbh = $connector->connect($this->config);
+        }
     }
 
     public function saveWordlist(Collection $stems)
@@ -61,7 +72,7 @@ class PropelEngine extends SqliteEngine
                     $this->updateWordlistStmt->bindValue(':hits', $term['hits']);
                     $this->updateWordlistStmt->bindValue(':keyword', $key);
                     $this->updateWordlistStmt->execute();
-                    if (!$this->inMemory) {
+                    if (!$this->inMemory || !array_key_exists($key, $this->inMemoryTerms)) {
                         $this->selectWordlistStmt->bindValue(':keyword', $key);
                         $this->selectWordlistStmt->execute();
                         $res = $this->selectWordlistStmt->fetch(PDO::FETCH_ASSOC);
