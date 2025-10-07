@@ -2,16 +2,14 @@
 
 namespace TntSearch\Controller\Front;
 
+use Symfony\Component\Routing\Annotation\Route;
 use OpenApi\Annotations as OA;
 use OpenApi\Model\Api\ModelFactory;
 use OpenApi\Service\OpenApiService;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Routing\Annotation\Route;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\HttpFoundation\Request;
-use Thelia\Model\Map\ContentTableMap;
-use TntSearch\Event\SaveRequestEvent;
 use TntSearch\Service\Search;
 
 /**

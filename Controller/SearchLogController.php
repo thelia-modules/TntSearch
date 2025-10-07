@@ -2,8 +2,8 @@
 
 namespace TntSearch\Controller;
 
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Thelia\Core\HttpFoundation\Response;
 use Thelia\Controller\Admin\BaseAdminController;
 
 

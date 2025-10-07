@@ -1,8 +1,9 @@
 <?php
 namespace TntSearch\Tokenizer;
 
-use TeamTNT\TNTSearch\Support\AbstractTokenizer;
-use TeamTNT\TNTSearch\Support\TokenizerInterface;
+
+use TeamTNT\TNTSearch\Tokenizer\AbstractTokenizer;
+use TeamTNT\TNTSearch\Tokenizer\TokenizerInterface;
 
 class Tokenizer extends AbstractTokenizer implements TokenizerInterface
 {

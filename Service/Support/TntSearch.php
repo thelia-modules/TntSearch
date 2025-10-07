@@ -26,7 +26,7 @@ class TntSearch extends BaseTNTSearch
 
         $this->loadConfig($config);
 
-        $this->stemmer = $config['stemmer'] ?? null;
+        $this->stemmer = $config['stemmer'] ? new $config['stemmer'] : null;
     }
 
     /**
