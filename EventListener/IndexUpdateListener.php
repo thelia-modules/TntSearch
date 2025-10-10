@@ -3,6 +3,8 @@
 namespace TntSearch\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Thelia\Core\Event\Brand\BrandDeleteEvent;
+use Thelia\Core\Event\Brand\BrandUpdateEvent;
 use Thelia\Core\Event\Category\CategoryDeleteEvent;
 use Thelia\Core\Event\Category\CategoryEvent;
 use Thelia\Core\Event\Content\ContentDeleteEvent;
@@ -39,6 +41,10 @@ class IndexUpdateListener implements EventSubscriberInterface
             TheliaEvents::CATEGORY_CREATE => ['updateCategoryIndex', 50],
             TheliaEvents::CATEGORY_UPDATE => ['updateCategoryIndex', 50],
             TheliaEvents::CATEGORY_DELETE => ['updateCategoryIndex', 50],
+
+            TheliaEvents::BRAND_CREATE => ['updateBrandIndex', 50],
+            TheliaEvents::BRAND_UPDATE => ['updateBrandIndex', 50],
+            TheliaEvents::BRAND_DELETE => ['updateBrandIndex', 50],
 
             TheliaEvents::FOLDER_CREATE => ['updateFolderIndex', 50],
             TheliaEvents::FOLDER_UPDATE => ['updateFolderIndex', 50],
@@ -113,6 +119,19 @@ class IndexUpdateListener implements EventSubscriberInterface
 
             if (!$deleteMode) {
                 $this->itemIndexation->indexOneItemOnIndexes($event->getFolder()->getId(), 'folder');
+            }
+        }
+    }
+
+    public function updateBrandIndex(BrandUpdateEvent $event): void
+    {
+        if ($event->getBrand()) {
+            $deleteMode = $event instanceof BrandDeleteEvent;
+
+            $this->itemIndexation->deleteItemOnIndexes($event->getBrand()->getId(), 'brand');
+
+            if (!$deleteMode) {
+                $this->itemIndexation->indexOneItemOnIndexes($event->getBrand()->getId(), 'brand');
             }
         }
     }

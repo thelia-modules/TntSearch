@@ -11,7 +11,7 @@ class Brand extends BaseIndex
 
     public function buildSqlQuery(int $itemId = null, string $locale = null): string
     {
-        return '
+        $query = '
              SELECT b.id AS id,
             bi.title AS title,
             bi.chapo AS chapo,
@@ -20,5 +20,11 @@ class Brand extends BaseIndex
             FROM brand AS b LEFT JOIN brand_i18n AS bi ON b.id = bi.id
             WHERE bi.locale=\'' . $locale . '\'
         ';
+
+        if ($itemId) {
+            $query .= ' AND b.id =' . $itemId;
+        }
+
+        return $query;
     }
 }

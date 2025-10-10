@@ -11,7 +11,7 @@ class Order extends BaseIndex
 
     public function buildSqlQuery(int $itemId = null, string $locale = null): string
     {
-        return '
+        $query = '
             SELECT `order`.id AS id,
             `order`.id AS order_id,
             `order`.ref AS ref,
@@ -23,7 +23,13 @@ class Order extends BaseIndex
             `order`.transaction_ref AS transaction_ref,
             `order`.delivery_ref AS delivery_ref
             FROM `order` 
-            LEFT JOIN customer ON `order`.customer_id = customer.id;
+            LEFT JOIN customer ON `order`.customer_id = customer.id
         ';
+
+        if ($itemId) {
+            $query .= ' WHERE `order`.id =' . $itemId;
+        }
+
+        return $query;
     }
 }

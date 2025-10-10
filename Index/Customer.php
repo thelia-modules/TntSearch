@@ -16,7 +16,7 @@ class Customer extends BaseIndex
 
     public function buildSqlQuery(int $itemId = null, string $locale = null): string
     {
-        return '
+        $query = '
             SELECT customer.id, 
             customer.ref, 
             customer.firstname,                    
@@ -26,7 +26,13 @@ class Customer extends BaseIndex
             address.zipcode, 
             address.city  
             FROM customer
-            JOIN address ON address.customer_id=customer.id;
+            JOIN address ON address.customer_id=customer.id
         ';
+
+        if ($itemId) {
+            $query .= ' WHERE customer.id=' . $itemId;
+        }
+
+        return $query;
     }
 }
