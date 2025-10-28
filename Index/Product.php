@@ -51,9 +51,8 @@ class Product extends BaseIndex
 
         if ($itemId) {
             $query .= ' AND product.id=' . $itemId;
-        } else {
-            $query .= ' GROUP BY product.id';
         }
+        $query .= ' GROUP BY product.id';
 
         return $query;
     }
