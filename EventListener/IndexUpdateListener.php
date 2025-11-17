@@ -3,18 +3,23 @@
 namespace TntSearch\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Thelia\Core\Event\Brand\BrandCreateEvent;
 use Thelia\Core\Event\Brand\BrandDeleteEvent;
 use Thelia\Core\Event\Brand\BrandUpdateEvent;
+use Thelia\Core\Event\Category\CategoryCreateEvent;
 use Thelia\Core\Event\Category\CategoryDeleteEvent;
-use Thelia\Core\Event\Category\CategoryEvent;
+use Thelia\Core\Event\Category\CategoryUpdateEvent;
+use Thelia\Core\Event\Content\ContentCreateEvent;
 use Thelia\Core\Event\Content\ContentDeleteEvent;
-use Thelia\Core\Event\Customer\CustomerEvent;
+use Thelia\Core\Event\Content\ContentUpdateEvent;
+use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
+use Thelia\Core\Event\Folder\FolderCreateEvent;
 use Thelia\Core\Event\Folder\FolderDeleteEvent;
-use Thelia\Core\Event\Folder\FolderEvent;
+use Thelia\Core\Event\Folder\FolderUpdateEvent;
+use Thelia\Core\Event\Product\ProductCreateEvent;
 use Thelia\Core\Event\Product\ProductDeleteEvent;
-use Thelia\Core\Event\Product\ProductEvent;
+use Thelia\Core\Event\Product\ProductUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\Content\ContentEvent;
 use TntSearch\Service\ItemIndexation;
 use TntSearch\TntSearch;
 
@@ -60,10 +65,10 @@ class IndexUpdateListener implements EventSubscriberInterface
     }
 
     /**
-     * @param CustomerEvent $event
+     * @param CustomerCreateOrUpdateEvent $event
      * @return void
      */
-    public function updateCustomerIndex(CustomerEvent $event): void
+    public function updateCustomerIndex(CustomerCreateOrUpdateEvent $event): void
     {
         if ($event->hasCustomer()) {
             $this->itemIndexation->deleteItemOnIndexes($event->getCustomer()->getId(), 'customer');
@@ -72,10 +77,10 @@ class IndexUpdateListener implements EventSubscriberInterface
     }
 
     /**
-     * @param ProductEvent $event
+     * @param ProductCreateEvent|ProductUpdateEvent|ProductDeleteEvent $event
      * @return void
      */
-    public function updateProductIndex(ProductEvent $event): void
+    public function updateProductIndex(ProductCreateEvent|ProductUpdateEvent|ProductDeleteEvent $event): void
     {
         if ($event->getProduct()) {
             $deleteMode = $event instanceof ProductDeleteEvent;
@@ -90,10 +95,10 @@ class IndexUpdateListener implements EventSubscriberInterface
     }
 
     /**
-     * @param CategoryEvent $event
+     * @param CategoryCreateEvent|CategoryUpdateEvent|CategoryDeleteEvent $event
      * @return void
      */
-    public function updateCategoryIndex(CategoryEvent $event): void
+    public function updateCategoryIndex(CategoryCreateEvent|CategoryUpdateEvent|CategoryDeleteEvent $event): void
     {
         if ($event->getCategory()) {
             $deleteMode = $event instanceof CategoryDeleteEvent;
@@ -107,10 +112,10 @@ class IndexUpdateListener implements EventSubscriberInterface
     }
 
     /**
-     * @param FolderEvent $event
+     * @param FolderCreateEvent|FolderUpdateEvent|FolderDeleteEvent $event
      * @return void
      */
-    public function updateFolderIndex(FolderEvent $event): void
+    public function updateFolderIndex(FolderCreateEvent|FolderUpdateEvent|FolderDeleteEvent $event): void
     {
         if ($event->getFolder()) {
             $deleteMode = $event instanceof FolderDeleteEvent;
@@ -123,7 +128,12 @@ class IndexUpdateListener implements EventSubscriberInterface
         }
     }
 
-    public function updateBrandIndex(BrandUpdateEvent $event): void
+
+    /**
+     * @param BrandCreateEvent|BrandUpdateEvent|BrandDeleteEvent $event
+     * @return void
+     */
+    public function updateBrandIndex(BrandCreateEvent|BrandUpdateEvent|BrandDeleteEvent $event): void
     {
         if ($event->getBrand()) {
             $deleteMode = $event instanceof BrandDeleteEvent;
@@ -137,10 +147,10 @@ class IndexUpdateListener implements EventSubscriberInterface
     }
 
     /**
-     * @param ContentEvent $event
+     * @param ContentCreateEvent|ContentUpdateEvent|ContentDeleteEvent $event
      * @return void
      */
-    public function updateContentIndex(ContentEvent $event): void
+    public function updateContentIndex(ContentCreateEvent|ContentUpdateEvent|ContentDeleteEvent $event): void
     {
         if ($event->getContent()) {
             $deleteMode = $event instanceof ContentDeleteEvent;
