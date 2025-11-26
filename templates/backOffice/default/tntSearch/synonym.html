@@ -1,0 +1,263 @@
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}
+    {intl l="Manage Synonyms"}
+{/block}
+
+{block name="main-content"}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                {if $success}
+                    <div class="alert alert-success alert-dismissible" role="alert">
+                        <button type="button" class="close" data-dismiss="alert">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        {$success}
+                    </div>
+                {/if}
+
+                {if $error}
+                    <div class="alert alert-danger alert-dismissible" role="alert">
+                        <button type="button" class="close" data-dismiss="alert">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        {$error}
+                    </div>
+                {/if}
+
+                <!-- Bouton pour ouvrir la modale -->
+                <div class="mb-4">
+                    <a href="#add_synonym_dialog" data-toggle="modal" class="btn btn-primary">
+                        <i class="glyphicon glyphicon-plus"></i> {intl l="Add New Synonym Group"}
+                    </a>
+                </div>
+
+                <!-- Liste des groupes de synonymes -->
+                <div class="general-block-decorator">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <caption class="clearfix">
+                                {intl l="Existing Synonym Groups"}
+                            </caption>
+                            {if $synonymGroups|count > 0}
+                                <thead>
+                                <tr>
+                                    <th>{intl l="ID"}</th>
+                                    <th>{intl l="Terms"}</th>
+                                    <th>{intl l="Status"}</th>
+                                    <th class="actions">{intl l="Actions"}</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {foreach from=$synonymGroups item=group}
+                                    <tr data-group-id="{$group.group_id}">
+                                        <td><strong>{$group.group_id}</strong></td>
+                                        <td>
+                                            <div class="synonym-terms-display">
+                                                <small>{','|implode:$group.terms}</small>
+                                            </div>
+                                            <input type="text" class="form-control synonym-terms-input"
+                                                   value="{','|implode:$group.terms}"
+                                                   style="display: none; width: 100%;">
+                                        </td>
+                                        <td>
+                                            {if $group.enabled}
+                                                <span class="label label-success">{intl l="Enabled"}</span>
+                                            {else}
+                                                <span class="label label-danger">{intl l="Disabled"}</span>
+                                            {/if}
+                                        </td>
+                                        <td class="actions">
+                                            <button type="button" class="btn btn-sm btn-warning synonym-edit"
+                                                    title="{intl l="Edit"}">
+                                                <i class="glyphicon glyphicon-pencil"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-success synonym-save"
+                                                    style="display: none;"
+                                                    data-group-id="{$group.group_id}"
+                                                    title="{intl l="Save"}">
+                                                <i class="glyphicon glyphicon-ok"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-secondary synonym-cancel"
+                                                    style="display: none;"
+                                                    title="{intl l="Cancel"}">
+                                                <i class="glyphicon glyphicon-remove"></i>
+                                            </button>
+                                            <a href="#delete_synonym_dialog" data-toggle="modal"
+                                               data-id="{$group.group_id}" class="btn btn-sm btn-danger synonym-delete"
+                                               title="{intl l="Delete"}">
+                                                <i class="glyphicon glyphicon-trash"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {/foreach}
+                                </tbody>
+                            {else}
+                                <tbody>
+                                <tr>
+                                    <td colspan="4">
+                                        <div class="alert alert-info">
+                                            {intl l="No synonym groups found. Create your first group!"}
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            {/if}
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {* -- Modale d'ajout de synonymes ----------------------------------- *}
+    {capture name="add_synonym_form"}
+    {form name="synonym_form"}
+        {form_field field='terms'}
+        <div class="form-group">
+            <label for="synonymTerms" class="control-label">{intl l="Synonyms"}</label>
+            <input type="text" class="form-control" id="synonymTerms" name="{$name}"
+                   placeholder="{intl l="e.g., red, rouge, crimson, scarlet"}" required>
+            <p class="help-block">{intl l="Enter words separated by commas"}</p>
+        </div>
+        {/form_field}
+        {form_field field='success_url'}
+            <input type="hidden" name="{$name}" value="{navigate to="current"}">
+        {/form_field}
+
+        {form_field field='error_url'}
+            <input type="hidden" name="{$name}" value="{navigate to="current"}">
+        {/form_field}
+    {/form}
+    {/capture}
+
+    {include file="includes/generic-confirm-dialog.html"
+    dialog_id="add_synonym_dialog"
+    dialog_title={intl l="Add New Synonym Group"}
+    dialog_message=""
+    form_action         = {url path='/admin/module/TntSearch/synonym/save'}
+    form_content        = {$smarty.capture.add_synonym_form nofilter}
+}
+
+    {* -- Modale de suppression de synonymes ----------------------------------- *}
+    {capture name="delete_synonym_form"}
+        <input type="hidden" name="group_id" id="delete_group_id" value=""/>
+    {/capture}
+
+    {include file="includes/generic-confirm-dialog.html"
+    dialog_id="delete_synonym_dialog"
+    dialog_title={intl l="Delete Synonym Group"}
+    dialog_message={intl l="Do you really want to delete this synonym group?"}
+    form_action         = {url path='/admin/module/TntSearch/synonym/delete'}
+    form_content        = {$smarty.capture.delete_synonym_form nofilter}
+}
+
+{/block}
+
+{block name="javascript-initialization"}
+    <script>
+        $(function() {
+            $('button.synonym-edit').click(function(ev) {
+                ev.preventDefault();
+                const $row = $(this).closest('tr');
+                $row.find('.synonym-terms-display').hide();
+                $row.find('.synonym-terms-input').show();
+                $row.find('.synonym-edit').hide();
+                $row.find('.synonym-save, .synonym-cancel').show();
+            });
+
+            $('button.synonym-cancel').click(function(ev) {
+                ev.preventDefault();
+                const $row = $(this).closest('tr');
+                $row.find('.synonym-terms-input').hide();
+                $row.find('.synonym-terms-display').show();
+                $row.find('.synonym-save, .synonym-cancel').hide();
+                $row.find('.synonym-edit').show();
+
+                $('.container-fluid').find('.alert-ajax').remove();
+            });
+
+            function showAlert(message, type = 'success') {
+                $('.container-fluid').find('.alert-ajax').remove();
+
+                const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+                const title = type === 'success' ? '' : '<strong>Erreur :</strong> ';
+
+                const $alert = $('<div class="alert ' + alertClass + ' alert-dismissible alert-ajax" role="alert">' +
+                    '<button type="button" class="close" data-dismiss="alert">' +
+                    '<span aria-hidden="true">&times;</span></button>' +
+                    title + message +
+                    '</div>').prependTo('.container-fluid');
+
+                if (type === 'success') {
+                    setTimeout(function() {
+                        $alert.fadeOut(function() {
+                            $(this).remove();
+                        });
+                    }, 3000);
+                }
+            }
+
+            $('button.synonym-save').click(function(ev) {
+                ev.preventDefault();
+                const $row = $(this).closest('tr');
+                const groupId = $(this).data('group-id');
+                const terms = $row.find('.synonym-terms-input').val();
+
+                const formData = new FormData();
+                formData.append('synonym_form[group_id]', groupId);
+                formData.append('synonym_form[terms]', terms);
+
+                $.ajax({
+                    type: 'POST',
+                    url: '{url path='/admin/module/TntSearch/synonym/save'}',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function(response) {
+                        $row.find('.synonym-terms-display small').text(terms);
+                        $row.find('.synonym-terms-input').hide();
+                        $row.find('.synonym-terms-display').show();
+                        $row.find('.synonym-save, .synonym-cancel').hide();
+                        $row.find('.synonym-edit').show();
+
+                        showAlert('{intl l="Synonymes mis à jour avec succès !"}', 'success');
+                    },
+                    error: function(xhr, status, error) {
+                        let errorMessage = '{intl l="Erreur lors de la mise à jour des synonymes"}';
+
+                        try {
+                            if (xhr.responseJSON && xhr.responseJSON.error) {
+                                errorMessage = xhr.responseJSON.error;
+                            } else if (xhr.responseText) {
+                                errorMessage = xhr.responseText;
+                            }
+                        } catch(e) {
+                        }
+
+                        showAlert(errorMessage, 'error');
+
+                        $row.find('.synonym-terms-input').show();
+                        $row.find('.synonym-terms-display').hide();
+                    }
+                });
+            });
+
+            $('a.synonym-delete').click(function(ev) {
+                ev.preventDefault();
+                $('#delete_group_id').val($(this).data('id'));
+            });
+
+            $('#add_synonym_dialog').on('hidden.bs.modal', function() {
+                $('#groupId').val('');
+                $('#synonymTerms').val('');
+                $('#enabled').prop('checked', true);
+            });
+        });
+    </script>
+{/block}
+
+{block name="javascript-last-call"}
+    {hook name="synonym.js" location="synonym-js"}
+{/block}

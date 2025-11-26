@@ -9,4 +9,16 @@
         <column name="locale" type="VARCHAR" size="255" />
         <column name="num_hits" type="INTEGER" />
     </table>
+
+    <table name="tnt_synonym">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="term" type="VARCHAR" size="255" required="true"/>
+        <column name="group_id" type="INTEGER" required="true"/>
+        <column name="enabled" type="BOOLEAN" required="true" defaultValue="true"/>
+        <column name="position" type="INTEGER" required="true"/>
+
+        <index name="idx_synonym">
+            <index-column name="term"/>
+        </index>
+    </table>
 </database>

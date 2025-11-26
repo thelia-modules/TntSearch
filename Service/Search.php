@@ -54,7 +54,7 @@ class Search
                 $event->setLocale($locale)
                     ->setIndex($index->getIndexName())
                     ->setSearchWords($searchWords)
-                ->setHits(count($result[$index->getIndexName()]));
+                    ->setHits(count($result[$index->getIndexName()]));
 
                 $this->dispatcher->dispatch($event, SaveRequestEvent::SAVE_REQUEST);
 

@@ -53,6 +53,10 @@ class TntSearchProvider
             $tnt->setStopWords($stopWords);
         }
 
+        if ($tokenizer) {
+            $tnt->tokenizer = new $tokenizer;
+        }
+
         return $tnt;
     }
 

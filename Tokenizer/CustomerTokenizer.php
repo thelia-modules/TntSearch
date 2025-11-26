@@ -2,8 +2,8 @@
 
 namespace TntSearch\Tokenizer;
 
-use TeamTNT\TNTSearch\Tokenizer\AbstractTokenizer;
-use TeamTNT\TNTSearch\Tokenizer\TokenizerInterface;
+use TeamTNT\TNTSearch\Support\AbstractTokenizer;
+use TeamTNT\TNTSearch\Support\TokenizerInterface;
 
 class CustomerTokenizer extends AbstractTokenizer implements TokenizerInterface
 {
