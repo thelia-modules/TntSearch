@@ -64,7 +64,7 @@ class Synonym
 
             TntSynonymQuery::create()
                 ->filterByGroupId($groupId)
-                ->filterByTerm($term)
+                ->filterByTerm(trim($term))
                 ->findOneOrCreate()
                 ->setPosition($index + 1)
                 ->save();
