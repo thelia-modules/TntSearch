@@ -30,9 +30,7 @@ class IndexationProvider
         foreach ($this->indexes as $index) {
             try {
                 $output?->write('<info>' . $index::class . ' </info>');
-                if($index->getIndexName() === 'product'){
-                    $index->index();
-                }
+                $index->index();
             } catch (\Exception $e) {
                 $output?->write('<error>' . $e->getMessage() . '</error>');
                 Tlog::getInstance()->addError('Error on TntSearch indexation ' . $e->getMessage());
