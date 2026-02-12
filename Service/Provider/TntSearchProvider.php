@@ -2,6 +2,7 @@
 
 namespace TntSearch\Service\Provider;
 
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Filesystem\Filesystem;
 use TntSearch\Service\Support\TNTGeoSearch;
 use TntSearch\Service\Stemmer;
@@ -11,11 +12,11 @@ use TntSearch\Service\Support\TntSearch;
 
 class TntSearchProvider
 {
-    const INDEXES_DIR = THELIA_LOCAL_DIR . "TNTIndexes";
-
     public function __construct(
         protected Stemmer  $stemmer,
-        protected StopWord $stopWord
+        protected StopWord $stopWord,
+        #[Autowire(env: 'APP_ENV')]
+        private string $appEnv
     )
     {
     }
@@ -60,17 +61,27 @@ class TntSearchProvider
         return $tnt;
     }
 
+    public function cleanFile(string $indexName): void
+    {
+        $file = \TntSearch\TntSearch::INDEXES_DIR . DS . $indexName;
+
+        if (is_file($file)) {
+            unlink($file);
+        }
+    }
 
     protected function getConfigs(?string $stemmer = null, ?string $tokenizer = null): array
     {
-        if (!is_dir(self::INDEXES_DIR)) {
+        $storage = \TntSearch\TntSearch::INDEXES_DIR . DS . $this->appEnv;
+
+        if (!is_dir($storage)) {
             $fs = new Filesystem();
-            $fs->mkdir(self::INDEXES_DIR);
+            $fs->mkdir($storage);
         }
 
         // You need to empty the modes to set the sql_mode parameter to null
         $config = array_merge([
-            'storage' => self::INDEXES_DIR,
+            'storage' => $storage,
             'modes' => [''],
             'stemmer' => $stemmer,
             'tokenizer' => $tokenizer,

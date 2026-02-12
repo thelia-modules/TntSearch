@@ -5,7 +5,6 @@ namespace TntSearch\Commands;
 use Exception;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Command\ContainerAwareCommand;
 use TntSearch\Service\Provider\IndexationProvider;
 use TntSearch\TntSearch;
@@ -27,12 +26,6 @@ class GenerateIndexesCommand extends ContainerAwareCommand
     public function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->initRequest();
-
-        $fs = new Filesystem();
-
-        if (is_dir(TntSearch::INDEXES_DIR)) {
-            $fs->remove(TntSearch::INDEXES_DIR);
-        }
 
         try {
             $this->indexationProvider->indexAll($output);

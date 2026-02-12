@@ -13,6 +13,7 @@ use TntSearch\Event\ExtendQueryEvent;
 use TntSearch\Event\WeightEvent;
 use TntSearch\Service\Provider\TntSearchProvider;
 use TntSearch\Tokenizer\Tokenizer;
+use TntSearch\TntSearch;
 
 abstract class BaseIndex implements TntSearchIndexInterface
 {
@@ -102,6 +103,8 @@ abstract class BaseIndex implements TntSearchIndexInterface
     protected function indexOneIndex(string $locale = null): void
     {
         $indexFileName = $this->getIndexFileName($locale);
+
+        $this->tntSearchProvider->cleanFile($indexFileName);
 
         try {
             $tntSate = $this->tntSearchProvider->getTntSearch($this->getTokenizer(), $locale);

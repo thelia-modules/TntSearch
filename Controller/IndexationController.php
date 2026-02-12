@@ -3,7 +3,6 @@
 namespace TntSearch\Controller;
 
 use Exception;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Thelia\Controller\Admin\BaseAdminController;
@@ -24,14 +23,7 @@ class IndexationController extends BaseAdminController
         ini_set('max_execution_time', 3600);
 
         try {
-            $fs = new Filesystem();
-
-            if (is_dir(TntSearch::INDEXES_DIR)) {
-                $fs->remove(TntSearch::INDEXES_DIR);
-            }
-
             $indexationProvider->indexAll();
-
         } catch (Exception $exception) {
             $error = $exception->getMessage();
 
