@@ -70,7 +70,7 @@ class SearchOpenApiController extends BaseFrontController
      */
     public function apiSearch(Search $search, Request $request, ModelFactory $modelFactory)
     {
-        $searchWords = $request->get('q');
+        $searchWords = $request->get('q', "");
         $locale = $request->getSession()->getLang()->getLocale();
 
         $resultsByIndex = $search->search(
