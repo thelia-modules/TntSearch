@@ -3,21 +3,13 @@
 namespace TntSearch\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Thelia\Controller\Admin\BaseAdminController;
 
-
-
-/**
- * @Route("/admin/search_log", name="front_search_log_")
- */
+#[Route("/admin/search_log", name: "front_search_log_")]
 class SearchLogController extends BaseAdminController
 {
-    /**
-     * @Route("", name="front_search_log_loop", methods="GET")
-     *
-     * @return Response
-     */
+    #[Route("", name: "front_search_log_loop", methods: ["GET"])]
     public function searchLogAdminAction(): Response
     {
         return $this->render('tntSearch/search_log');

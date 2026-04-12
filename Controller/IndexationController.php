@@ -4,20 +4,16 @@ namespace TntSearch\Controller;
 
 use Exception;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Tools\URL;
 use TntSearch\Service\Provider\IndexationProvider;
 use TntSearch\TntSearch;
 
-/**
- * @Route("/admin/module/TntSearch", name="tntsearch_indexation")
- */
+#[Route("/admin/module/TntSearch", name: "tntsearch_indexation")]
 class IndexationController extends BaseAdminController
 {
-    /**
-     * @Route("/generate-indexes", name="_generation", methods="GET")
-     */
+    #[Route("/generate-indexes", name: "_generation", methods: ["GET"])]
     public function generateIndexesAction(IndexationProvider $indexationProvider): Response
     {
         ini_set('max_execution_time', 3600);
