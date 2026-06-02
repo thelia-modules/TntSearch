@@ -321,6 +321,19 @@ class FrenchStemmer implements Stemmer
             return 3;
         }
 
+        // oux (Snowball 2024)
+        //      replace with ou if preceded by b, h, j, l, n or p
+        if (($position = $this->search(['oux'])) !== false) {
+            $before = $position - 1;
+            $letter = mb_substr($this->word, $before, 1);
+
+            if (in_array($letter, ['b', 'h', 'j', 'l', 'n', 'p'])) {
+                $this->word = preg_replace('#(oux)$#u', 'ou', $this->word);
+            }
+
+            return 3;
+        }
+
         // euse   euses
         //      delete if in R2, else replace by eux if in R1
         if (($position = $this->search(['euses', 'euse'])) !== false) {
@@ -415,6 +428,28 @@ class FrenchStemmer implements Stemmer
             return true;
         }
 
+        // ais   aise   aises (Snowball 2024 Subset 4)
+        //      delete when the remaining stem is at least 4 chars
+        //
+        // Diverges from spec on two counts:
+        //  - no RV constraint: spec rvIndex skips past consonants like 'gl' in "anglais",
+        //    which would prevent the rule from firing and break "anglais"/"anglaise" merge.
+        //  - no exclusion list: spec preserves "balais", "mauvais", "deplais" to keep them
+        //    distinct, but step 4 below strips the final 's' anyway, so the exclusion would
+        //    only desynchronise singular and feminine forms ("mauvais"/"mauvaise").
+        //  - min length 4 on the remaining stem: protects short verb forms like "fais",
+        //    "sais", "tais" from collapsing; they fall through to subset 2's 'ais' rule
+        //    or to step 4's 's' stripping.
+        if (($position = $this->search(['aises', 'aise', 'ais'])) !== false) {
+            $before = mb_substr($this->word, 0, $position);
+
+            if (mb_strlen($before) >= 4) {
+                $this->word = $before;
+
+                return true;
+            }
+        }
+
         // âmes   ât   âtes   a   ai   aIent   ais   ait   ant   ante   antes   ants   as   asse   assent   asses   assiez   assions
         //      delete
         //      if preceded by e, delete
@@ -461,8 +496,14 @@ class FrenchStemmer implements Stemmer
      */
     private function step4()
     {
-        //If the word ends s, not preceded by a, i, o, u, è or s, delete it.
-        if (preg_match('#[^aiouès]s$#', $this->word)) {
+        // E-commerce variant of Snowball step 4 residual 's' rule.
+        // Spec is: delete final 's' unless preceded by a, i, o, u, è or s.
+        // We diverge: delete final 's' unless preceded by 's'.
+        // Reason: spec preserves 's' on singulars like "héros", "tapis", "univers", but also
+        // blocks plural collapse for very common French plurals in -os/-is/-as/-us (velos, amis,
+        // sushis, bonus, agendas). For a product search index, collapsing plurals matters more
+        // than preserving rare singulars; isolated nouns just get a slightly shorter index term.
+        if (preg_match('#[^s]s$#u', $this->word)) {
             $this->word = mb_substr($this->word, 0, -1);
         }
 
