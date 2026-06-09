@@ -15,7 +15,7 @@ class ConfigurationController extends BaseAdminController
     #[Route("", name: "_on_the_fly", methods: ["POST"])]
     public function configuration(Request $request): RedirectResponse
     {
-        $onTheFlyUpdate = (bool)$request->get('on-the-fly-update', false);
+        $onTheFlyUpdate = (bool)$request->request->get('on-the-fly-update', false);
 
         TntSearch::setConfigValue(TntSearch::ON_THE_FLY_UPDATE, $onTheFlyUpdate);
 
