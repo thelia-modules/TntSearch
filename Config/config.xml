@@ -13,11 +13,4 @@
         <service id="tntsearch.search" alias="TntSearch\Service\Search" public="true" />
         <service id="tntsearch.indexation.provider" alias="TntSearch\Service\Provider\IndexationProvider" public="true" />
     </services>
-
-    <hooks>
-        <hook id="tntsearch.hook" class="TntSearch\Hook\BackHook">
-            <tag name="hook.event_listener" event="module.configuration" type="back" method="onModuleConfig"/>
-            <tag name="hook.event_listener" event="main.top-menu-tools" type="back" method="onMainTopMenuTools" />
-        </hook>
-    </hooks>
 </config>
