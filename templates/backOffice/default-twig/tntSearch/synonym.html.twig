@@ -5,7 +5,7 @@
 {% block content %}
     <div id="tntsearch-synonym"
          data-save-url="{{ path('synonym_save_synonym') }}"
-         data-token="{{ assignToken() }}">
+         data-token="{{ form._token.vars.value }}">
         {% if success %}
             <div class="alert alert-success alert-dismissible" role="alert">
                 {{ success }}
@@ -212,7 +212,7 @@
                     const body = new URLSearchParams();
                     body.append('synonym_form[group_id]', groupId);
                     body.append('synonym_form[terms]', terms);
-                    body.append('_token', token);
+                    body.append('synonym_form[_token]', token);
 
                     fetch(saveUrl, {
                         method: 'POST',

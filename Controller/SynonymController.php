@@ -3,7 +3,6 @@
 namespace TntSearch\Controller;
 
 use Exception;
-use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -49,7 +48,7 @@ class SynonymController extends BaseAdminController
         ParserContext $parserContext
     ): JsonResponse|RedirectResponse
     {
-        $form = $this->createForm(SynonymForm::class, FormType::class, [], ['csrf_protection' => false]);
+        $form = $this->createForm(SynonymForm::class);
 
         try {
             $data = $this->validateForm($form)->getData();
