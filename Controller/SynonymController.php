@@ -11,6 +11,7 @@ use Thelia\Core\HttpFoundation\JsonResponse;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Form\Exception\FormValidationException;
+use Thelia\Tools\TokenProvider;
 use Thelia\Tools\URL;
 use Twig\Environment;
 use TntSearch\Form\SynonymForm;
@@ -79,8 +80,10 @@ class SynonymController extends BaseAdminController
     }
 
     #[Route('/synonym/delete', name: '_delete_synonym', methods: ['POST'])]
-    public function deleteAction(Request $request): RedirectResponse
+    public function deleteAction(Request $request, TokenProvider $tokenProvider): RedirectResponse
     {
+        $tokenProvider->checkToken((string) $request->request->get('_token'));
+
         $synonymId = $request->request->get('group_id');
 
         if (!$synonymId) {
