@@ -70,15 +70,17 @@ class SearchOpenApiController extends BaseFrontController
      */
     public function apiSearch(Search $search, Request $request, ModelFactory $modelFactory)
     {
-        $searchWords = $request->get('q', "");
-        $locale = $request->getSession()->getLang()->getLocale();
+        $searchWords = $request->attributes->get('q', $request->query->get('q', $request->request->get('q', "")));
+        $locale = $request->hasSession()
+            ? $request->getSession()->getLang()->getLocale()
+            : (\Thelia\Model\LangQuery::create()->findOneByByDefault(true)?->getLocale() ?? 'en_US');
 
         $resultsByIndex = $search->search(
             $searchWords,
-            ($index = $request->get('indexes')) ? explode(',', $index) : null,
+            ($index = $request->attributes->get('indexes', $request->query->get('indexes', $request->request->get('indexes')))) ? explode(',', $index) : null,
             $locale,
-            $request->get('offset', 0),
-            $request->get('limit', 100),
+            $request->attributes->get('offset', $request->query->get('offset', $request->request->get('offset', 0))),
+            $request->attributes->get('limit', $request->query->get('limit', $request->request->get('limit', 100))),
         );
 
         $data = [];
