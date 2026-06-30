@@ -23,6 +23,8 @@
             <p>{{ 'Click the button below to immediately generate search indexes. It may take some time...'|trans({}, 'tntsearch') }}</p>
         </div>
 
-        <a href="{{ path('tntsearch_indexation_generation') }}" class="btn btn-danger">{{ 'Generate indexes'|trans({}, 'tntsearch') }}</a>
+        <form method="post" class="d-inline" action="{{ path('tntsearch_indexation_generation') }}?_token={{ assignToken() }}">
+            <button type="submit" class="btn btn-danger">{{ 'Generate indexes'|trans({}, 'tntsearch') }}</button>
+        </form>
     </div>
 </div>
