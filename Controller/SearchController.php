@@ -31,7 +31,9 @@ class SearchController extends BaseAdminController
         IndexationProvider $indexationProvider
     ): Response {
         $searchTerm = (string) $request->query->get('search_term', '');
-        $locale = $request->getSession()->getAdminLang()->getLocale();
+        $locale = $request->hasSession()
+            ? $request->getSession()->getAdminLang()->getLocale()
+            : (\Thelia\Model\LangQuery::create()->findOneByByDefault(true)?->getLocale() ?? 'en_US');
 
         $idsByType = [];
 

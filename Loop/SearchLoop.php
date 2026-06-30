@@ -42,16 +42,20 @@ class SearchLoop extends BaseLoop implements ArraySearchLoopInterface
     public function buildArray(): array
     {
         $request = $this->getCurrentRequest();
-        $session = $request->getSession();
 
         if (!$search = $this->getSearch()) {
             return [];
         }
 
         if (!$locale = $this->getLocale()) {
-            $locale = $session->getLang()->getLocale();
-            if ($this->getBackendContext()) {
-                $locale = $session->getAdminLang()->getLocale();
+            if (null !== $request && $request->hasSession()) {
+                $session = $request->getSession();
+                $locale = $session->getLang()->getLocale();
+                if ($this->getBackendContext()) {
+                    $locale = $session->getAdminLang()->getLocale();
+                }
+            } else {
+                $locale = \Thelia\Model\LangQuery::create()->findOneByByDefault(true)?->getLocale() ?? 'en_US';
             }
         }
 
