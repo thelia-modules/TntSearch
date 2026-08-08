@@ -35,8 +35,8 @@
         </author>
     </authors>
     <type>classic</type>
-    <thelia>2.5.0</thelia>
-    <stability>other</stability>
+    <thelia>3.0.0</thelia>
+    <stability>prod</stability>
     <mandatory>0</mandatory>
     <hidden>0</hidden>
 </module>
