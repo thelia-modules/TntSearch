@@ -5,8 +5,7 @@
   "require": {
     "ext-json": "*",
     "thelia/installer": "^1.6",
-    "teamtnt/tntsearch": "~5.0.0",
-    "thelia/open-api-module": "dev-twig"
+    "teamtnt/tntsearch": "~5.0.0"
   },
   "extra": {
     "installer-name": "TntSearch"
