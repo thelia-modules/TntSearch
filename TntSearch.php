@@ -22,7 +22,7 @@ class TntSearch extends BaseModule
     /** @var string */
     const ON_THE_FLY_UPDATE = 'tntsearch.on_the_fly_update';
 
-    public function postActivation(ConnectionInterface $con = null): void
+    public function postActivation(?ConnectionInterface $con = null): void
     {
         self::setConfigValue(self::ON_THE_FLY_UPDATE, false);
         if (!self::getConfigValue('is_initialized', false)) {
@@ -33,7 +33,7 @@ class TntSearch extends BaseModule
 
     }
 
-    public function update($currentVersion, $newVersion, ConnectionInterface $con = null): void
+    public function update($currentVersion, $newVersion, ?ConnectionInterface $con = null): void
     {
         if (version_compare($currentVersion, '0.7.0') === -1) {
             self::setConfigValue(self::ON_THE_FLY_UPDATE, true);

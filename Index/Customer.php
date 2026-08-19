@@ -14,7 +14,7 @@ class Customer extends BaseIndex
         return \TntSearch\Tokenizer\CustomerTokenizer::class;
     }
 
-    public function buildSqlQuery(int $itemId = null, string $locale = null): string
+    public function buildSqlQuery(?int $itemId = null, ?string $locale = null): string
     {
         $query = '
             SELECT customer.id, 

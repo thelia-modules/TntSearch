@@ -21,7 +21,7 @@ class TntSearchProvider
     {
     }
 
-    public function getTntSearch(string $tokenizer = null, string $locale = null): TntSearch
+    public function getTntSearch(?string $tokenizer = null, ?string $locale = null): TntSearch
     {
         return $this->buildTntSearch(
             $this->stemmer->getStemmer($locale),
@@ -46,7 +46,7 @@ class TntSearchProvider
         return $geoSearch;
     }
 
-    public function buildTntSearch(string $stemmer, array $stopWords = [], string $tokenizer = null): TntSearch
+    public function buildTntSearch(string $stemmer, array $stopWords = [], ?string $tokenizer = null): TntSearch
     {
         $tnt = new TntSearch($this->getConfigs($stemmer, $tokenizer));
 

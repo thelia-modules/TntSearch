@@ -50,7 +50,7 @@ abstract class BaseIndex implements TntSearchIndexInterface
         return strtolower($reflectionClass->getShortName());
     }
 
-    public function getIndexFileName(string $locale = null, bool $isGeo = false): string
+    public function getIndexFileName(?string $locale = null, bool $isGeo = false): string
     {
         $indexName = $this->getIndexName();
         $indexFileName = $this->getIndexName() . '.index';
@@ -100,7 +100,7 @@ abstract class BaseIndex implements TntSearchIndexInterface
         $geoIndexer->run();
     }
 
-    protected function indexOneIndex(string $locale = null): void
+    protected function indexOneIndex(?string $locale = null): void
     {
         $indexFileName = $this->getIndexFileName($locale);
 
@@ -152,7 +152,7 @@ abstract class BaseIndex implements TntSearchIndexInterface
         return false;
     }
 
-    public function buildSqlGeoQuery(int $itemId = null): ?string
+    public function buildSqlGeoQuery(?int $itemId = null): ?string
     {
         return null;
     }

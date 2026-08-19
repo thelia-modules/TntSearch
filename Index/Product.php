@@ -17,7 +17,7 @@ class Product extends BaseIndex
         return true;
     }
 
-    public function buildSqlQuery(int $itemId = null, string $locale = null): string
+    public function buildSqlQuery(?int $itemId = null, ?string $locale = null): string
     {
         if (!$locale && $this->isTranslatable()) {
             throw new LogicException(Translator::getInstance()->trans('Missing locale parameter to index translatable index'), [], TNTSearch::DOMAIN_NAME);

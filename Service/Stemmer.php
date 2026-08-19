@@ -20,7 +20,7 @@ class Stemmer
 
     public function __construct(protected EventDispatcherInterface $dispatcher) {}
 
-    public function getStemmer(string $locale = null): string
+    public function getStemmer(?string $locale = null): string
     {
         $stemmerEvent = new StemmerEvent();
         $stemmerEvent

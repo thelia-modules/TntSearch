@@ -10,7 +10,7 @@ interface TntSearchIndexInterface
 
     public function isGeoIndexable(): bool;
 
-    public function buildSqlQuery(int $itemId = null, string $locale = null): string;
+    public function buildSqlQuery(?int $itemId = null, ?string $locale = null): string;
 
-    public function buildSqlGeoQuery(int $itemId = null): ?string;
+    public function buildSqlGeoQuery(?int $itemId = null): ?string;
 }

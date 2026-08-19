@@ -9,7 +9,7 @@ class Order extends BaseIndex
         return false;
     }
 
-    public function buildSqlQuery(int $itemId = null, string $locale = null): string
+    public function buildSqlQuery(?int $itemId = null, ?string $locale = null): string
     {
         $query = '
             SELECT `order`.id AS id,

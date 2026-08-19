@@ -9,7 +9,7 @@ class Brand extends BaseIndex
         return true;
     }
 
-    public function buildSqlQuery(int $itemId = null, string $locale = null): string
+    public function buildSqlQuery(?int $itemId = null, ?string $locale = null): string
     {
         $query = '
              SELECT b.id AS id,

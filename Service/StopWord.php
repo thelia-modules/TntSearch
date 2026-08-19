@@ -9,7 +9,7 @@ class StopWord
 {
     public function __construct(protected EventDispatcherInterface $dispatcher) {}
 
-    public function getStopWords(string $locale = null): array
+    public function getStopWords(?string $locale = null): array
     {
         $event = new StopWordEvent();
         $event->setLocale($locale);
