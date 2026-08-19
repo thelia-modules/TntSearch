@@ -13,7 +13,7 @@ class IndexPass implements CompilerPassInterface
      * @param ContainerBuilder $container
      * @return void
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->has(IndexationProvider::class)) {
             return;

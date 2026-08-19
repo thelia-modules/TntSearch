@@ -38,7 +38,7 @@ class LogSearchResultListener extends BaseAction implements EventSubscriberInter
         return  $entry;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return array(
             SaveRequestEvent::SAVE_REQUEST           => array("saveRequest", 128),

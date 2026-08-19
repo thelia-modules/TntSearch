@@ -16,7 +16,7 @@ class GenerateIndexesCommand extends ContainerAwareCommand
         parent::__construct();
     }
 
-    public function configure()
+    protected function configure(): void
     {
         $this
             ->setName('tntsearch:indexes')
