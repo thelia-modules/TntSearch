@@ -12,7 +12,7 @@ use TntSearch\Index\TntSearchIndexInterface;
 class IndexationProvider
 {
     /** @var BaseIndex[] */
-    protected array $indexes;
+    protected array $indexes = [];
 
     /**
      * @throws ReflectionException
