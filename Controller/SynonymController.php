@@ -3,16 +3,17 @@
 namespace TntSearch\Controller;
 
 use Exception;
-use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Core\HttpFoundation\JsonResponse;
 use Thelia\Core\HttpFoundation\Request;
-use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Form\Exception\FormValidationException;
+use Thelia\Tools\TokenProvider;
 use Thelia\Tools\URL;
+use Twig\Environment;
 use TntSearch\Form\SynonymForm;
 use TntSearch\Model\TntSynonymQuery;
 use TntSearch\Service\Synonym;
@@ -20,16 +21,25 @@ use TntSearch\Service\Synonym;
 #[Route('/admin/module/TntSearch', name: 'synonym')]
 class SynonymController extends BaseAdminController
 {
+    public function __construct(private readonly Environment $twig)
+    {
+    }
+
     #[Route('/synonym', name: '_list_synonym', methods: ['GET'])]
     public function listAction(Synonym $synonymService): Response
     {
         $synonymGroups = $synonymService->getSynonymGroups();
 
-        return $this->render('tntSearch/synonym', [
-            'synonymGroups' => $synonymGroups,
-            'success' => null,
-            'error' => null
-        ]);
+        $form = $this->createForm(SynonymForm::class);
+
+        return new Response(
+            $this->twig->render('@TntSearchModule/backOffice/default-twig/tntSearch/synonym.html.twig', [
+                'synonymGroups' => $synonymGroups,
+                'form' => $form->getForm()->createView(),
+                'success' => null,
+                'error' => null,
+            ])
+        );
     }
 
     #[Route('/synonym/save', name: '_save_synonym', methods: ['POST'])]
@@ -39,7 +49,7 @@ class SynonymController extends BaseAdminController
         ParserContext $parserContext
     ): JsonResponse|RedirectResponse
     {
-        $form = $this->createForm(SynonymForm::class, FormType::class, [], ['csrf_protection' => false]);
+        $form = $this->createForm(SynonymForm::class);
 
         try {
             $data = $this->validateForm($form)->getData();
@@ -70,8 +80,10 @@ class SynonymController extends BaseAdminController
     }
 
     #[Route('/synonym/delete', name: '_delete_synonym', methods: ['POST'])]
-    public function deleteAction(Request $request): RedirectResponse
+    public function deleteAction(Request $request, TokenProvider $tokenProvider): RedirectResponse
     {
+        $tokenProvider->checkToken((string) $request->request->get('_token'));
+
         $synonymId = $request->request->get('group_id');
 
         if (!$synonymId) {

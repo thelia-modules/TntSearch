@@ -24,7 +24,7 @@ class PropelConnector extends Connector implements ConnectorInterface
     {
         $parameters = [];
         foreach ($_SERVER as $key => $value) {
-            if (str_starts_with($key, 'DB_')) {
+            if (str_starts_with($key, 'DATABASE_')) {
                 $parameters['thelia.' . strtolower($key)] = $value;
             }
         }

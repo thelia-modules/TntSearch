@@ -10,26 +10,38 @@ use TntSearch\TntSearch;
 
 class BackHook extends BaseHook
 {
-    public function onModuleConfig(HookRenderEvent $event)
+    public static function getSubscribedHooks(): array
+    {
+        return [
+            'module.configuration' => [
+                ['type' => 'back', 'method' => 'onModuleConfig'],
+            ],
+            'main.top-menu-tools' => [
+                ['type' => 'back', 'method' => 'onMainTopMenuTools'],
+            ],
+        ];
+    }
+
+    public function onModuleConfig(HookRenderEvent $event): void
     {
         $event->add(
             $this->render(
-                "module_configuration.html",
+                'TntSearch/module-configuration.html.twig',
                 [
-                    'on_the_fly_update' => TntSearch::getConfigValue(TntSearch::ON_THE_FLY_UPDATE, true)
+                    'on_the_fly_update' => TntSearch::getConfigValue(TntSearch::ON_THE_FLY_UPDATE, true),
                 ]
             )
         );
     }
 
-    public function onMainTopMenuTools(HookRenderBlockEvent $event)
+    public function onMainTopMenuTools(HookRenderBlockEvent $event): void
     {
         $event->add(
             [
                 'id' => 'search_log_menu_tags',
                 'class' => '',
                 'url' => URL::getInstance()->absoluteUrl('/admin/search_log'),
-                'title' => $this->trans("Search logs", [], TntSearch::DOMAIN_NAME)
+                'title' => $this->trans('Search logs', [], TntSearch::DOMAIN_NAME),
             ]
         );
 
@@ -38,7 +50,7 @@ class BackHook extends BaseHook
                 'id' => 'search_synonyme_menu',
                 'class' => '',
                 'url' => URL::getInstance()->absoluteUrl('/admin/module/TntSearch/synonym'),
-                'title' => $this->trans("Synonym Management", [], TntSearch::DOMAIN_NAME)
+                'title' => $this->trans('Synonym Management', [], TntSearch::DOMAIN_NAME),
             ]
         );
     }

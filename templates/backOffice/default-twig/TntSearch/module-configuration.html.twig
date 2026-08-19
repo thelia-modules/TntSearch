@@ -1,0 +1,30 @@
+{# TntSearch back-office configuration (module.configuration hook fragment) #}
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="post" action="{{ path('tntsearch_configuration__on_the_fly') }}">
+            <input type="hidden" name="_token" value="{{ assignToken() }}">
+            <div class="alert alert-info">
+                <p>{{ 'If this box is checked, the search indexes will be updated each time a product, category, folder, content, brand, ... is updated. This could take some time, depending on your configuration.'|trans({}, 'tntsearch') }}</p>
+                <p>{{ 'When the box is unchecked, you have to rebuild the indexes manually (see button below) or automatically using a cron which trigger the index build: <code>Thelia tntsearch:indexes</code>'|trans({}, 'tntsearch')|raw }}</p>
+            </div>
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="on-the-fly-update" name="on-the-fly-update" value="1" {{ on_the_fly_update ? 'checked' : '' }}>
+                <label class="form-check-label" for="on-the-fly-update">{{ 'Update indexes in real time'|trans({}, 'tntsearch') }}</label>
+            </div>
+
+            <button type="submit" class="btn btn-primary">{{ 'Update'|trans }}</button>
+        </form>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="alert alert-info">
+            <p>{{ 'Click the button below to immediately generate search indexes. It may take some time...'|trans({}, 'tntsearch') }}</p>
+        </div>
+
+        <form method="post" class="d-inline" action="{{ path('tntsearch_indexation_generation') }}?_token={{ assignToken() }}">
+            <button type="submit" class="btn btn-danger">{{ 'Generate indexes'|trans({}, 'tntsearch') }}</button>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,296 @@
+{% extends '@BackOfficeDefaultTwig/base.html.twig' %}
+
+{% block title %}{{ 'Search for \'%term\''|trans({'%term': searchTerm}, 'tntsearch') }}{% endblock %}
+
+{% block content %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/admin/home">{{ 'Home'|trans }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ 'Search for \'%term\''|trans({'%term': searchTerm}, 'tntsearch') }}</li>
+        </ol>
+    </nav>
+
+    {# Customer search #}
+    <div class="card mb-3">
+        <div class="card-header">{{ 'Customer'|trans({}, 'tntsearch') }}</div>
+        <div class="card-body">
+            {% if customers|length > 0 %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>{{ 'customer ref'|trans({}, 'tntsearch') }}</th>
+                            <th>{{ 'company'|trans({}, 'tntsearch') }}</th>
+                            <th>{{ 'firstname & lastname'|trans({}, 'tntsearch') }}</th>
+                            <th>{{ 'Email address'|trans({}, 'tntsearch') }}</th>
+                            {{ safe_hook('customers.header') }}
+                            <th class="text-end">{{ 'Actions'|trans({}, 'tntsearch') }}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for customer in customers %}
+                            <tr>
+                                <td><a href="/admin/customer/update?customer_id={{ customer.id }}">{{ customer.ref }}</a></td>
+                                <td>{{ customer.company }}</td>
+                                <td>{{ customer.firstname }} {{ customer.lastname }}</td>
+                                <td><a href="mailto:{{ customer.email }}">{{ customer.email }}</a></td>
+                                {{ safe_hook('customers.row', {customer_id: customer.id}) }}
+                                <td class="text-end">
+                                    <a href="/admin/customer/update?customer_id={{ customer.id }}" class="btn btn-sm btn-secondary" title="{{ 'Edit this customer'|trans({}, 'tntsearch') }}"><i class="bi bi-pencil"></i></a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info mb-0">{{ 'No customer found for "%term"'|trans({'%term': searchTerm}, 'tntsearch') }}</div>
+            {% endif %}
+        </div>
+    </div>
+
+    {# Order search #}
+    <div class="card mb-3">
+        <div class="card-header">{{ 'Orders'|trans({}, 'tntsearch') }}</div>
+        <div class="card-body">
+            {% if orders|length > 0 %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>{{ 'Order n°'|trans({}, 'tntsearch') }}</th>
+                            <th>{{ 'Date & Hour'|trans({}, 'tntsearch') }}</th>
+                            <th>{{ 'Invoice'|trans({}, 'tntsearch') }}</th>
+                            <th>{{ 'Delivery'|trans({}, 'tntsearch') }}</th>
+                            <th>{{ 'Transaction'|trans({}, 'tntsearch') }}</th>
+                            {{ safe_hook('orders.table-header') }}
+                            <th class="text-end">{{ 'Actions'|trans({}, 'tntsearch') }}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for order in orders %}
+                            <tr>
+                                <td><a href="/admin/order/update/{{ order.id }}">{{ order.ref }}</a></td>
+                                <td>{{ order.create_date ? order.create_date|date('Y-m-d H:i') : '' }}</td>
+                                <td>{{ order.invoice_ref }}</td>
+                                <td>{{ order.delivery_ref }}</td>
+                                <td>{{ order.transaction_ref }}</td>
+                                {{ safe_hook('orders.table-row', {order_id: order.id}) }}
+                                <td class="text-end">
+                                    <a href="/admin/order/update/{{ order.id }}" class="btn btn-sm btn-secondary" title="{{ 'Edit this order'|trans({}, 'tntsearch') }}"><i class="bi bi-pencil"></i></a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info mb-0">{{ 'No order found for "%term"'|trans({'%term': searchTerm}, 'tntsearch') }}</div>
+            {% endif %}
+        </div>
+    </div>
+
+    {# Category search #}
+    <div class="card mb-3">
+        <div class="card-header">{{ 'Category'|trans({}, 'tntsearch') }}</div>
+        <div class="card-body">
+            {% if categories|length > 0 %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>{{ 'ID'|trans({}, 'tntsearch') }}</th>
+                            <th>{{ 'Category title'|trans({}, 'tntsearch') }}</th>
+                            {{ safe_hook('categories.header') }}
+                            <th class="text-center">{{ 'Online'|trans({}, 'tntsearch') }}</th>
+                            <th class="text-end">{{ 'Actions'|trans({}, 'tntsearch') }}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for category in categories %}
+                            <tr>
+                                <td>{{ category.id }}</td>
+                                <td><a href="/admin/categories/update?category_id={{ category.id }}">{{ category.title }}</a></td>
+                                {{ safe_hook('categories.row', {category_id: category.id}) }}
+                                <td class="text-center">
+                                    {% if category.visible %}<span class="badge text-bg-success"><i class="bi bi-check-lg"></i></span>{% else %}<span class="badge text-bg-danger"><i class="bi bi-x-lg"></i></span>{% endif %}
+                                </td>
+                                <td class="text-end">
+                                    <a href="/admin/categories/update?category_id={{ category.id }}" class="btn btn-sm btn-secondary" title="{{ 'Edit this category'|trans({}, 'tntsearch') }}"><i class="bi bi-pencil"></i></a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info mb-0">{{ 'No category found for "%term"'|trans({'%term': searchTerm}, 'tntsearch') }}</div>
+            {% endif %}
+        </div>
+    </div>
+
+    {# Product search #}
+    <div class="card mb-3">
+        <div class="card-header">{{ 'Product'|trans({}, 'tntsearch') }}</div>
+        <div class="card-body">
+            {% if products|length > 0 %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>{{ 'ID'|trans({}, 'tntsearch') }}</th>
+                            <th>{{ 'Reference'|trans({}, 'tntsearch') }}</th>
+                            <th>{{ 'Product title'|trans({}, 'tntsearch') }}</th>
+                            <th class="text-center">{{ 'Online'|trans({}, 'tntsearch') }}</th>
+                            <th class="text-end">{{ 'Actions'|trans({}, 'tntsearch') }}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for product in products %}
+                            <tr>
+                                <td>{{ product.id }}</td>
+                                <td>
+                                    <a href="/admin/products/update?product_id={{ product.id }}">{{ product.ref }}</a>
+                                    {% if product.virtual %}<i class="bi bi-download text-muted" title="{{ 'Virtual product'|trans({}, 'tntsearch') }}"></i>{% endif %}
+                                </td>
+                                <td><a href="/admin/products/update?product_id={{ product.id }}">{{ product.title }}</a></td>
+                                {{ safe_hook('products.row', {product_id: product.id}) }}
+                                <td class="text-center">
+                                    {% if product.visible %}<span class="badge text-bg-success"><i class="bi bi-check-lg"></i></span>{% else %}<span class="badge text-bg-danger"><i class="bi bi-x-lg"></i></span>{% endif %}
+                                </td>
+                                <td class="text-end">
+                                    <a href="/admin/products/update?product_id={{ product.id }}" class="btn btn-sm btn-secondary" title="{{ 'Edit this product'|trans({}, 'tntsearch') }}"><i class="bi bi-pencil"></i></a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info mb-0">{{ 'No product found for "%term"'|trans({'%term': searchTerm}, 'tntsearch') }}</div>
+            {% endif %}
+        </div>
+    </div>
+
+    {# Folder search #}
+    <div class="card mb-3">
+        <div class="card-header">{{ 'Folder'|trans({}, 'tntsearch') }}</div>
+        <div class="card-body">
+            {% if folders|length > 0 %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>{{ 'ID'|trans({}, 'tntsearch') }}</th>
+                            <th>{{ 'Folder title'|trans({}, 'tntsearch') }}</th>
+                            {{ safe_hook('folders.header') }}
+                            <th class="text-center">{{ 'Online'|trans({}, 'tntsearch') }}</th>
+                            <th class="text-end">{{ 'Actions'|trans({}, 'tntsearch') }}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for folder in folders %}
+                            <tr>
+                                <td>{{ folder.id }}</td>
+                                <td><a href="/admin/folders/update/{{ folder.id }}">{{ folder.title }}</a></td>
+                                {{ safe_hook('folders.row', {folder_id: folder.id}) }}
+                                <td class="text-center">
+                                    {% if folder.visible %}<span class="badge text-bg-success"><i class="bi bi-check-lg"></i></span>{% else %}<span class="badge text-bg-danger"><i class="bi bi-x-lg"></i></span>{% endif %}
+                                </td>
+                                <td class="text-end">
+                                    <a href="/admin/folders/update/{{ folder.id }}" class="btn btn-sm btn-secondary" title="{{ 'Edit this folder'|trans({}, 'tntsearch') }}"><i class="bi bi-pencil"></i></a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info mb-0">{{ 'No folder found for "%term"'|trans({'%term': searchTerm}, 'tntsearch') }}</div>
+            {% endif %}
+        </div>
+    </div>
+
+    {# Content search #}
+    <div class="card mb-3">
+        <div class="card-header">{{ 'Content'|trans({}, 'tntsearch') }}</div>
+        <div class="card-body">
+            {% if contents|length > 0 %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>{{ 'ID'|trans({}, 'tntsearch') }}</th>
+                            <th>{{ 'Content title'|trans({}, 'tntsearch') }}</th>
+                            {{ safe_hook('contents.header') }}
+                            <th class="text-center">{{ 'Online'|trans({}, 'tntsearch') }}</th>
+                            <th class="text-end">{{ 'Actions'|trans({}, 'tntsearch') }}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for content in contents %}
+                            <tr>
+                                <td>{{ content.id }}</td>
+                                <td><a href="/admin/content/update/{{ content.id }}">{{ content.title }}</a></td>
+                                {{ safe_hook('contents.row', {content_id: content.id}) }}
+                                <td class="text-center">
+                                    {% if content.visible %}<span class="badge text-bg-success"><i class="bi bi-check-lg"></i></span>{% else %}<span class="badge text-bg-danger"><i class="bi bi-x-lg"></i></span>{% endif %}
+                                </td>
+                                <td class="text-end">
+                                    <a href="/admin/content/update/{{ content.id }}" class="btn btn-sm btn-secondary" title="{{ 'Edit this content'|trans({}, 'tntsearch') }}"><i class="bi bi-pencil"></i></a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info mb-0">{{ 'No content found for "%term"'|trans({'%term': searchTerm}, 'tntsearch') }}</div>
+            {% endif %}
+        </div>
+    </div>
+
+    {# Brand search #}
+    <div class="card mb-3">
+        <div class="card-header">{{ 'Brand'|trans({}, 'tntsearch') }}</div>
+        <div class="card-body">
+            {% if brands|length > 0 %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>{{ 'ID'|trans({}, 'tntsearch') }}</th>
+                            <th>{{ 'Brand title'|trans({}, 'tntsearch') }}</th>
+                            {{ safe_hook('brands.table-header') }}
+                            <th class="text-center">{{ 'Online'|trans({}, 'tntsearch') }}</th>
+                            <th class="text-end">{{ 'Actions'|trans({}, 'tntsearch') }}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for brand in brands %}
+                            <tr>
+                                <td>{{ brand.id }}</td>
+                                <td><a href="/admin/brand/update/{{ brand.id }}">{{ brand.title }}</a></td>
+                                <td class="text-center">
+                                    {% if brand.visible %}<span class="badge text-bg-success"><i class="bi bi-check-lg"></i></span>{% else %}<span class="badge text-bg-danger"><i class="bi bi-x-lg"></i></span>{% endif %}
+                                </td>
+                                <td class="text-end">
+                                    <a href="/admin/brand/update/{{ brand.id }}" class="btn btn-sm btn-secondary" title="{{ 'Edit this brand'|trans({}, 'tntsearch') }}"><i class="bi bi-pencil"></i></a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info mb-0">{{ 'No brand found for "%term"'|trans({'%term': searchTerm}, 'tntsearch') }}</div>
+            {% endif %}
+        </div>
+    </div>
+
+    {{ safe_hook('search.bottom') }}
+{% endblock %}
+
+{% block scripts_extra %}
+    {{ safe_hook('search.js') }}
+{% endblock %}

@@ -1,10 +1,10 @@
 {
   "name": "thelia/tnt-search-module",
-  "license": "LGPL-3.0-or-later",
+  "license": "GPL-3.0-or-later",
   "type": "thelia-module",
   "require": {
     "ext-json": "*",
-    "thelia/installer": "~1.1",
+    "thelia/installer": "^1.6",
     "teamtnt/tntsearch": "~5.0.0"
   },
   "extra": {
