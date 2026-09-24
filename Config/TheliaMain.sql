@@ -16,6 +16,9 @@ CREATE TABLE `tnt_search_log`
     `index` VARCHAR(255),
     `locale` VARCHAR(255),
     `num_hits` INTEGER,
+    `search_count` INTEGER DEFAULT 1 NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
 

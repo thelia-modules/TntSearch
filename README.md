@@ -120,6 +120,10 @@ Le module supporte nativement :
 
 ## Maintenance
 
+### Historique des recherches
+
+Depuis la version 4.1.0, la table `tnt_search_log` compte les recherches : `search_count` augmente à chaque recherche d'un même terme (même index, même langue), et `created_at` / `updated_at` datent la première et la dernière. Le script `Config/update/4.1.0.sql` ajoute ces colonnes lors de la mise à jour du module ; les lignes déjà présentes gardent un compteur à 1 et des dates vides.
+
 ### Tâches Régulières
 
 - Réindexation périodique

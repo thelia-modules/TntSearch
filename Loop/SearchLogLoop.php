@@ -39,7 +39,8 @@ class SearchLogLoop extends BaseLoop implements ArraySearchLoopInterface
     public function buildArray(): array
     {
         return TntSearchLogQuery::create()
-            ->orderBy(TntSearchLogTableMap::COL_NUM_HITS,Criteria::DESC)
+            ->orderBy(TntSearchLogTableMap::COL_SEARCH_COUNT, Criteria::DESC)
+            ->orderBy(TntSearchLogTableMap::COL_NUM_HITS, Criteria::DESC)
             ->find()
             ->toArray();
     }
@@ -56,7 +57,8 @@ class SearchLogLoop extends BaseLoop implements ArraySearchLoopInterface
                 ->set('SEARCHWORDS', $result['SearchWords'])
                 ->set('INDEX', $result['Index'])
                 ->set('LOCALE', $result['Locale'])
-                ->set('NUMHITS', $result['NumHits']);
+                ->set('NUMHITS', $result['NumHits'])
+                ->set('SEARCHCOUNT', $result['SearchCount']);
             $loopResult->addRow($loopResultRow);
         }
 

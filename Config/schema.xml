@@ -8,6 +8,9 @@
         <column name="index" type="VARCHAR" size="255" />
         <column name="locale" type="VARCHAR" size="255" />
         <column name="num_hits" type="INTEGER" />
+        <column name="search_count" type="INTEGER" required="true" defaultValue="1" />
+
+        <behavior name="timestampable" />
     </table>
 
     <table name="tnt_synonym">

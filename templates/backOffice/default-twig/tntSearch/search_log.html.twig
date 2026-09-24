@@ -21,6 +21,7 @@
                         <th>{{ 'index'|trans({}, 'tntsearch') }}</th>
                         <th>{{ 'lang'|trans({}, 'tntsearch') }}</th>
                         <th>{{ 'Number Hits'|trans({}, 'tntsearch') }}</th>
+                        <th>{{ 'Searches'|trans({}, 'tntsearch') }}</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -30,10 +31,11 @@
                             <td>{{ row.Index }}</td>
                             <td>{{ row.Locale }}</td>
                             <td>{{ row.NumHits }}</td>
+                            <td>{{ row.SearchCount }}</td>
                         </tr>
                     {% else %}
                         <tr>
-                            <td colspan="4">
+                            <td colspan="5">
                                 <div class="alert alert-info mb-0">{{ 'No search log found.'|trans({}, 'tntsearch') }}</div>
                             </td>
                         </tr>

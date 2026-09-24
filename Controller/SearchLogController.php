@@ -21,6 +21,7 @@ class SearchLogController extends BaseAdminController
     public function searchLogAdminAction(): Response
     {
         $searchLogs = TntSearchLogQuery::create()
+            ->orderBy(TntSearchLogTableMap::COL_SEARCH_COUNT, Criteria::DESC)
             ->orderBy(TntSearchLogTableMap::COL_NUM_HITS, Criteria::DESC)
             ->find()
             ->toArray();
