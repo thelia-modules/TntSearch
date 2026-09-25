@@ -28,7 +28,7 @@ class SearchLogController extends BaseAdminController
 
         return new Response(
             $this->twig->render(
-                '@TntSearchModule/backOffice/default-twig/tntSearch/search_log.html.twig',
+                '@TntSearchModule/backOffice/default-twig/TntSearch/search_log.html.twig',
                 ['searchLogs' => $searchLogs]
             )
         );

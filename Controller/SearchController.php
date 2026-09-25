@@ -48,7 +48,7 @@ class SearchController extends BaseAdminController
         }
 
         return new Response(
-            $this->twig->render('@TntSearchModule/backOffice/default-twig/tntSearch/search.html.twig', [
+            $this->twig->render('@TntSearchModule/backOffice/default-twig/TntSearch/search.html.twig', [
                 'searchTerm' => $searchTerm,
                 'customers' => $this->loadCustomers($idsByType['customer'] ?? []),
                 'orders' => $this->loadOrders($idsByType['order'] ?? []),

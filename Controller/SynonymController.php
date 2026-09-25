@@ -33,7 +33,7 @@ class SynonymController extends BaseAdminController
         $form = $this->createForm(SynonymForm::class);
 
         return new Response(
-            $this->twig->render('@TntSearchModule/backOffice/default-twig/tntSearch/synonym.html.twig', [
+            $this->twig->render('@TntSearchModule/backOffice/default-twig/TntSearch/synonym.html.twig', [
                 'synonymGroups' => $synonymGroups,
                 'form' => $form->getForm()->createView(),
                 'success' => null,
