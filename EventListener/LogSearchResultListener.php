@@ -6,13 +6,15 @@ namespace TntSearch\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Action\BaseAction;
-use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\Product\ProductSearchedEvent;
 use TntSearch\Event\SaveRequestEvent;
 use TntSearch\Model\TntSearchLog;
 use TntSearch\Model\TntSearchLogQuery;
 
 class LogSearchResultListener extends BaseAction implements EventSubscriberInterface
 {
+    private const PRODUCT_INDEX = 'product';
+
     public function __construct(
         protected TntSearchLogQuery $tntSearchLogQuery
     )
@@ -26,18 +28,37 @@ class LogSearchResultListener extends BaseAction implements EventSubscriberInter
      */
     public function saveRequest(SaveRequestEvent $event): TntSearchLog
     {
-        $entry = $this->tntSearchLogQuery->findOneBySearchWordsAndLocaleAndIndex($event->getSearchWords(), $event->getLocale(), $event->getIndex());
+        return $this->log($event->getSearchWords(), $event->getLocale(), $event->getIndex(), $event->getHits());
+    }
+
+    /**
+     * A product search a front theme ran on its own (Flexy queries the catalogue through the API), logged on the
+     * product index like the searches of the module, so the search log sees the visitors' searches.
+     *
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    public function logShopSearch(ProductSearchedEvent $event): void
+    {
+        $this->log($event->getTerm(), $event->getLocale(), self::PRODUCT_INDEX, $event->getHits());
+    }
+
+    /**
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    private function log(string $searchWords, string $locale, string $index, int $hits): TntSearchLog
+    {
+        $entry = $this->tntSearchLogQuery->findOneBySearchWordsAndLocaleAndIndex($searchWords, $locale, $index);
 
         if (null === $entry) {
             $entry = new TntSearchLog();
-            $entry->setSearchWords($event->getSearchWords())
-                ->setLocale($event->getLocale())
-                ->setIndex($event->getIndex());
+            $entry->setSearchWords($searchWords)
+                ->setLocale($locale)
+                ->setIndex($index);
         } else {
             $entry->setSearchCount($entry->getSearchCount() + 1);
         }
 
-        $entry->setNumHits($event->getHits());
+        $entry->setNumHits($hits);
         $entry->save();
 
         return $entry;
@@ -45,8 +66,11 @@ class LogSearchResultListener extends BaseAction implements EventSubscriberInter
 
     public static function getSubscribedEvents(): array
     {
+        // The core raises ProductSearchedEvent under its class name; ::class does not load the class, so the
+        // subscription holds on a core that does not ship the event yet.
         return array(
             SaveRequestEvent::SAVE_REQUEST           => array("saveRequest", 128),
+            ProductSearchedEvent::class              => array("logShopSearch", 128),
         );
     }
 

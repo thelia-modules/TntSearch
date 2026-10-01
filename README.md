@@ -124,6 +124,10 @@ Le module supporte nativement :
 
 Depuis la version 4.1.0, la table `tnt_search_log` compte les recherches : `search_count` augmente à chaque recherche d'un même terme (même index, même langue), et `created_at` / `updated_at` datent la première et la dernière. Le script `Config/update/4.1.0.sql` ajoute ces colonnes lors de la mise à jour du module ; les lignes déjà présentes gardent un compteur à 1 et des dates vides.
 
+Le module journalise aussi les recherches de produits qu'un thème de boutique fait sans lui : un thème qui interroge le catalogue par l'API (Flexy) déclenche l'événement du cœur `Thelia\Core\Event\Product\ProductSearchedEvent`, et le module l'enregistre sur l'index `product`, comme ses propres recherches. Sur un cœur qui ne fournit pas encore cet événement, rien ne change.
+
+Les tests du module se lancent depuis la racine de l'installation Thelia, à travers le wrapper `phpc` du cœur : `composer phpc -- ./vendor/bin/phpunit -c local/modules/TntSearch/phpunit.xml.dist`.
+
 ### Tâches Régulières
 
 - Réindexation périodique
