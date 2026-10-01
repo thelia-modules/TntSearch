@@ -7,6 +7,7 @@ namespace TntSearch\EventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Action\BaseAction;
 use Thelia\Core\Event\Product\ProductSearchedEvent;
+use Thelia\Log\Tlog;
 use TntSearch\Event\SaveRequestEvent;
 use TntSearch\Model\TntSearchLog;
 use TntSearch\Model\TntSearchLogQuery;
@@ -14,6 +15,9 @@ use TntSearch\Model\TntSearchLogQuery;
 class LogSearchResultListener extends BaseAction implements EventSubscriberInterface
 {
     private const PRODUCT_INDEX = 'product';
+
+    // search_words is a VARCHAR(255)
+    private const SEARCH_WORDS_LENGTH = 255;
 
     public function __construct(
         protected TntSearchLogQuery $tntSearchLogQuery
@@ -35,11 +39,16 @@ class LogSearchResultListener extends BaseAction implements EventSubscriberInter
      * A product search a front theme ran on its own (Flexy queries the catalogue through the API), logged on the
      * product index like the searches of the module, so the search log sees the visitors' searches.
      *
-     * @throws \Propel\Runtime\Exception\PropelException
+     * The term comes from a public URL: it is cut to the column length, and a log that cannot be written never
+     * breaks the shopper's search page.
      */
     public function logShopSearch(ProductSearchedEvent $event): void
     {
-        $this->log($event->getTerm(), $event->getLocale(), self::PRODUCT_INDEX, $event->getHits());
+        try {
+            $this->log(mb_substr($event->getTerm(), 0, self::SEARCH_WORDS_LENGTH), $event->getLocale(), self::PRODUCT_INDEX, $event->getHits());
+        } catch (\Throwable $exception) {
+            Tlog::getInstance()->addError('TntSearch could not log a shop search: '.$exception->getMessage());
+        }
     }
 
     /**
