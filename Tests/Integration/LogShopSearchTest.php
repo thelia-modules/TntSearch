@@ -57,6 +57,15 @@ final class LogShopSearchTest extends IntegrationTestCase
         self::assertSame(1, $this->entry(self::TERM, 'en_US')->getSearchCount());
     }
 
+    public function testATermLongerThanTheColumnIsCutToIt(): void
+    {
+        $term = self::TERM.str_repeat('é', 300);
+
+        $this->search($term, 'fr_FR', 0);
+
+        self::assertSame(1, $this->entry(mb_substr($term, 0, 255), 'fr_FR')->getSearchCount());
+    }
+
     private function search(string $term, string $locale, int $hits): void
     {
         $this->getService(EventDispatcherInterface::class)->dispatch(new ProductSearchedEvent($term, $locale, $hits));
