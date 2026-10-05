@@ -18,7 +18,7 @@ class IndexationController extends BaseAdminController
     #[Route("/generate-indexes", name: "_generation", methods: ["POST"])]
     public function generateIndexesAction(Request $request, TokenProvider $tokenProvider, IndexationProvider $indexationProvider): Response
     {
-        $tokenProvider->checkToken((string) $request->query->get('_token'));
+        $tokenProvider->checkToken((string) $request->request->get('_token'));
 
         ini_set('max_execution_time', 3600);
 

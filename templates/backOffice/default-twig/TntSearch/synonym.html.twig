@@ -101,7 +101,8 @@
                 <div class="alert alert-info">
                     <p>{{ 'Click the button below to immediately generate search indexes. It may take some time...'|trans({}, 'tntsearch') }}</p>
                 </div>
-                <form method="post" action="{{ path('tntsearch_indexation_generation') }}?_token={{ assignToken() }}">
+                <form method="post" action="{{ path('tntsearch_indexation_generation') }}">
+                    <input type="hidden" name="_token" value="{{ assignToken() }}">
                     <button type="submit" class="btn btn-danger">{{ 'Generate indexes'|trans({}, 'tntsearch') }}</button>
                 </form>
             </div>
