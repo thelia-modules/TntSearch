@@ -1,7 +1,7 @@
 <?php
 namespace TntSearch\Stemmer;
 
-use TeamTNT\TNTSearch\Stemmer\Stemmer;
+use TeamTNT\TNTSearch\Stemmer\StemmerInterface;
 
 /**
  * Modification du stemmer standard qui vient avec TNTSearch pour supprimer les accents.
@@ -11,7 +11,7 @@ use TeamTNT\TNTSearch\Stemmer\Stemmer;
  *
  */
 
-class FrenchStemmer implements Stemmer
+class FrenchStemmer implements StemmerInterface
 {
     /**
      * All french vowels
