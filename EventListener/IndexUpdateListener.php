@@ -33,11 +33,8 @@ class IndexUpdateListener implements EventSubscriberInterface
 
     public static function getSubscribedEvents(): array
     {
-        // We don't update indexes if updates on back-office changes is disabled.
-        if (false === (bool)TntSearch::getConfigValue(TntSearch::ON_THE_FLY_UPDATE, true)) {
-            return [];
-        }
-
+        // Always subscribed: the "update in real time" setting is read when an event comes (isEnabled()), so
+        // saving it in the back-office takes effect without a cache clear.
         return [
             TheliaEvents::PRODUCT_CREATE => ['updateProductIndex', 50],
             TheliaEvents::PRODUCT_UPDATE => ['updateProductIndex', 50],
@@ -70,6 +67,10 @@ class IndexUpdateListener implements EventSubscriberInterface
      */
     public function updateCustomerIndex(CustomerCreateOrUpdateEvent $event): void
     {
+        if (!$this->isEnabled()) {
+            return;
+        }
+
         if ($event->hasCustomer()) {
             $this->itemIndexation->deleteItemOnIndexes($event->getCustomer()->getId(), 'customer');
             $this->itemIndexation->indexOneItemOnIndexes($event->getCustomer()->getId(), 'customer');
@@ -82,6 +83,10 @@ class IndexUpdateListener implements EventSubscriberInterface
      */
     public function updateProductIndex(ProductCreateEvent|ProductUpdateEvent|ProductDeleteEvent $event): void
     {
+        if (!$this->isEnabled()) {
+            return;
+        }
+
         if ($event->getProduct()) {
             $deleteMode = $event instanceof ProductDeleteEvent;
 
@@ -100,6 +105,10 @@ class IndexUpdateListener implements EventSubscriberInterface
      */
     public function updateCategoryIndex(CategoryCreateEvent|CategoryUpdateEvent|CategoryDeleteEvent $event): void
     {
+        if (!$this->isEnabled()) {
+            return;
+        }
+
         if ($event->getCategory()) {
             $deleteMode = $event instanceof CategoryDeleteEvent;
 
@@ -117,6 +126,10 @@ class IndexUpdateListener implements EventSubscriberInterface
      */
     public function updateFolderIndex(FolderCreateEvent|FolderUpdateEvent|FolderDeleteEvent $event): void
     {
+        if (!$this->isEnabled()) {
+            return;
+        }
+
         if ($event->getFolder()) {
             $deleteMode = $event instanceof FolderDeleteEvent;
 
@@ -135,6 +148,10 @@ class IndexUpdateListener implements EventSubscriberInterface
      */
     public function updateBrandIndex(BrandCreateEvent|BrandUpdateEvent|BrandDeleteEvent $event): void
     {
+        if (!$this->isEnabled()) {
+            return;
+        }
+
         if ($event->getBrand()) {
             $deleteMode = $event instanceof BrandDeleteEvent;
 
@@ -152,6 +169,10 @@ class IndexUpdateListener implements EventSubscriberInterface
      */
     public function updateContentIndex(ContentCreateEvent|ContentUpdateEvent|ContentDeleteEvent $event): void
     {
+        if (!$this->isEnabled()) {
+            return;
+        }
+
         if ($event->getContent()) {
             $deleteMode = $event instanceof ContentDeleteEvent;
 
@@ -161,5 +182,10 @@ class IndexUpdateListener implements EventSubscriberInterface
                 $this->itemIndexation->indexOneItemOnIndexes($event->getContent()->getId(), 'content');
             }
         }
+    }
+
+    private function isEnabled(): bool
+    {
+        return (bool) TntSearch::getConfigValue(TntSearch::ON_THE_FLY_UPDATE, true);
     }
 }
