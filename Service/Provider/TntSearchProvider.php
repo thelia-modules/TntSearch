@@ -70,6 +70,16 @@ class TntSearchProvider
         }
     }
 
+    /**
+     * Whether an index of this name was built in the current environment, in one locale at least.
+     */
+    public function hasIndexFile(string $indexName): bool
+    {
+        $storage = \TntSearch\TntSearch::INDEXES_DIR . DS . $this->appEnv . DS;
+
+        return is_file($storage . $indexName . '.index') || [] !== (glob($storage . $indexName . '_*.index') ?: []);
+    }
+
     protected function getConfigs(?string $stemmer = null, ?string $tokenizer = null): array
     {
         $storage = \TntSearch\TntSearch::INDEXES_DIR . DS . $this->appEnv;
