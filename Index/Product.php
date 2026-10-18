@@ -3,8 +3,8 @@
 namespace TntSearch\Index;
 
 use Symfony\Component\Process\Exception\LogicException;
-use TNTSearch\TNTSearch;
 use Thelia\Core\Translation\Translator;
+use TntSearch\TntSearch;
 
 class Product extends BaseIndex
 {
@@ -20,7 +20,7 @@ class Product extends BaseIndex
     public function buildSqlQuery(?int $itemId = null, ?string $locale = null): string
     {
         if (!$locale && $this->isTranslatable()) {
-            throw new LogicException(Translator::getInstance()->trans('Missing locale parameter to index translatable index'), [], TNTSearch::DOMAIN_NAME);
+            throw new LogicException(Translator::getInstance()->trans('Missing locale parameter to index translatable index', [], TntSearch::DOMAIN_NAME));
         }
 
         $query = 'SELECT product.id AS id, 
