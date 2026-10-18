@@ -11,7 +11,7 @@ use TeamTNT\TNTSearch\Stemmer\StemmerInterface;
  *
  */
 
-class FrenchStemmer implements StemmerInterface
+final class FrenchStemmer implements StemmerInterface
 {
     /**
      * All french vowels
