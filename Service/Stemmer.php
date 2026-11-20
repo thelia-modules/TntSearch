@@ -14,7 +14,7 @@ class Stemmer
         'fr_FR' => \TntSearch\Stemmer\FrenchStemmer::class,
         'it_IT' => \TeamTNT\TNTSearch\Stemmer\ItalianStemmer::class,
         'de_DE' => \TeamTNT\TNTSearch\Stemmer\GermanStemmer::class,
-        'pt_PT' => \TeamTNT\TNTSearch\Stemmer\PolishStemmer::class,
+        'pt_PT' => \TeamTNT\TNTSearch\Stemmer\PortugueseStemmer::class,
         'ru_RU' => \TeamTNT\TNTSearch\Stemmer\RussianStemmer::class,
     ];
 

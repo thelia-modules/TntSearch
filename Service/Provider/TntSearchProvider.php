@@ -80,14 +80,20 @@ class TntSearchProvider
         return is_file($storage . $indexName . '.index') || [] !== (glob($storage . $indexName . '_*.index') ?: []);
     }
 
-    protected function getConfigs(?string $stemmer = null, ?string $tokenizer = null): array
+    public function storageDirectory(): string
     {
         $storage = \TntSearch\TntSearch::INDEXES_DIR . DS . $this->appEnv;
 
         if (!is_dir($storage)) {
-            $fs = new Filesystem();
-            $fs->mkdir($storage);
+            (new Filesystem())->mkdir($storage);
         }
+
+        return $storage;
+    }
+
+    protected function getConfigs(?string $stemmer = null, ?string $tokenizer = null): array
+    {
+        $storage = $this->storageDirectory();
 
         // You need to empty the modes to set the sql_mode parameter to null
         $config = array_merge([

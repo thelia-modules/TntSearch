@@ -45,13 +45,5 @@ class BackHook extends BaseHook
             ]
         );
 
-        $event->add(
-            [
-                'id' => 'search_synonyme_menu',
-                'class' => '',
-                'url' => URL::getInstance()->absoluteUrl('/admin/module/TntSearch/synonym'),
-                'title' => $this->trans('Synonym Management', [], TntSearch::DOMAIN_NAME),
-            ]
-        );
     }
 }

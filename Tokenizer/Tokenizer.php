@@ -7,8 +7,6 @@ use TeamTNT\TNTSearch\Tokenizer\TokenizerInterface;
 
 class Tokenizer extends AbstractTokenizer implements TokenizerInterface
 {
-    use SynonymResolverTrait;
-
     static protected $pattern = '/[^\p{L}\p{N}@]+/u';
 
     public function tokenize($text, $stopwords = []): array
@@ -21,7 +19,7 @@ class Tokenizer extends AbstractTokenizer implements TokenizerInterface
             return mb_strlen($token) > 2;
         });
 
-        $tokens = array_unique(array_map(fn (string $token) => $this->normalizeToken($token), $splits));
+        $tokens = array_unique($splits);
 
         return array_diff($tokens, $stopwords);
     }

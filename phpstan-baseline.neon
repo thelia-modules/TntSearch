@@ -1,4 +1,2 @@
 parameters:
-	excludePaths:
-		analyse:
-			- Search/FlexyProductSearchEngine.php
+	ignoreErrors: []

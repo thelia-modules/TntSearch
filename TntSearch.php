@@ -2,7 +2,6 @@
 
 namespace TntSearch;
 
-use FlexyBundle\Search\ProductSearchEngineInterface;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ServicesConfigurator;
@@ -12,6 +11,8 @@ use Thelia\Log\Tlog;
 use Thelia\Module\BaseModule;
 use TntSearch\CompilerPass\IndexPass;
 use TntSearch\Index\BaseIndex;
+use TntSearch\Search\CatalogueReindexer;
+use TntSearch\Synonym\LegacySynonymMigration;
 
 class TntSearch extends BaseModule
 {
@@ -31,6 +32,9 @@ class TntSearch extends BaseModule
         if (null === self::getConfigValue(self::ON_THE_FLY_UPDATE)) {
             self::setConfigValue(self::ON_THE_FLY_UPDATE, true);
         }
+        self::setConfigValue(CatalogueReindexer::QUEUED, '');
+        self::removeDocumentIndexes($this->environment());
+
         if (!self::getConfigValue('is_initialized', false)) {
             $database = new Database($con);
             $database->insertSql(null, [__DIR__.'/Config/TheliaMain.sql']);
@@ -54,15 +58,51 @@ class TntSearch extends BaseModule
 
         try {
             $this->getContainer()->get('tntsearch.indexation.provider')->indexAll();
+
+            if ($this->getContainer()->has(CatalogueReindexer::class)) {
+                $catalogueReindexer = $this->getContainer()->get(CatalogueReindexer::class);
+                \PHP_SAPI === 'cli' ? $catalogueReindexer->rebuild() : $catalogueReindexer->queueOnceWhenMissing();
+            }
         } catch (\Throwable $exception) {
             Tlog::getInstance()->addError('TntSearch: the indexes could not be built at activation: '.$exception->getMessage());
         }
+    }
+
+    public function destroy(?ConnectionInterface $con = null, $deleteModuleData = false): void
+    {
+        if ($deleteModuleData) {
+            self::removeDocumentIndexes($this->environment());
+        }
+
+        parent::destroy($con, $deleteModuleData);
+    }
+
+    public static function removeDocumentIndexes(string $environment): void
+    {
+        foreach (glob(self::INDEXES_DIR.DS.$environment.DS.'document--*') ?: [] as $file) {
+            if (is_file($file) && !str_ends_with($file, '.lock')) {
+                unlink($file);
+            }
+        }
+    }
+
+    private function environment(): string
+    {
+        if ($this->hasContainer() && $this->getContainer()->hasParameter('kernel.environment')) {
+            return (string) $this->getContainer()->getParameter('kernel.environment');
+        }
+
+        return (string) ($_SERVER['APP_ENV'] ?? 'prod');
     }
 
     public function update($currentVersion, $newVersion, ?ConnectionInterface $con = null): void
     {
         if (version_compare($currentVersion, '0.7.0') === -1) {
             self::setConfigValue(self::ON_THE_FLY_UPDATE, true);
+        }
+
+        if (version_compare($currentVersion, '5.0.0', '<')) {
+            $this->moveToTheCoreSearch();
         }
 
         $finder = Finder::create()
@@ -78,6 +118,23 @@ class TntSearch extends BaseModule
             if (version_compare($currentVersion, $file->getBasename('.sql'), '<')) {
                 $database->insertSql(null, [$file->getPathname()]);
             }
+        }
+    }
+
+    private function moveToTheCoreSearch(): void
+    {
+        self::setConfigValue(CatalogueReindexer::QUEUED, '');
+
+        foreach (['product', 'category', 'content', 'folder', 'brand'] as $family) {
+            foreach (glob(self::INDEXES_DIR.DS.'*'.DS.$family.'_*.index*') ?: [] as $file) {
+                unlink($file);
+            }
+        }
+
+        try {
+            (new LegacySynonymMigration($this->getDispatcher(), Tlog::getInstance()))->migrate();
+        } catch (\Throwable $exception) {
+            Tlog::getInstance()->addError('TntSearch: the synonyms of the module could not be copied: '.$exception->getMessage());
         }
     }
 
@@ -97,15 +154,8 @@ class TntSearch extends BaseModule
      */
     public static function configureServices(ServicesConfigurator $servicesConfigurator): void
     {
-        $excluded = [__DIR__.'/I18n/*', __DIR__.'/Tests/*'];
-
-        // The Flexy search engine only exists when the Flexy theme ships its interface: the module boots without it.
-        if (!interface_exists(ProductSearchEngineInterface::class)) {
-            $excluded[] = __DIR__.'/Search/*';
-        }
-
         $servicesConfigurator->load(self::getModuleCode() . '\\', __DIR__)
-            ->exclude($excluded)
+            ->exclude([__DIR__.'/I18n/*', __DIR__.'/Tests/*', __DIR__.'/Engine/*'])
             ->autowire()
             ->autoconfigure();
     }

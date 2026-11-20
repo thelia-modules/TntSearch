@@ -6,6 +6,8 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Thelia\Controller\Admin\BaseAdminController;
+use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Security\Resource\AdminResources;
 use Twig\Environment;
 use TntSearch\Model\Map\TntSearchLogTableMap;
 use TntSearch\Model\TntSearchLogQuery;
@@ -20,6 +22,10 @@ class SearchLogController extends BaseAdminController
     #[Route("", name: "front_search_log_loop", methods: ["GET"])]
     public function searchLogAdminAction(): Response
     {
+        if (null !== $denied = $this->checkAuth(AdminResources::ORDER, [], AccessManager::VIEW)) {
+            return $denied;
+        }
+
         $searchLogs = TntSearchLogQuery::create()
             ->orderBy(TntSearchLogTableMap::COL_SEARCH_COUNT, Criteria::DESC)
             ->orderBy(TntSearchLogTableMap::COL_NUM_HITS, Criteria::DESC)

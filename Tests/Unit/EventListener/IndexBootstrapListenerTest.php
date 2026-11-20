@@ -14,60 +14,65 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use TntSearch\EventListener\IndexBootstrapListener;
+use TntSearch\Search\CatalogueReindexer;
 use TntSearch\Service\Provider\IndexationProvider;
 use TntSearch\Service\Provider\TntSearchProvider;
 
 /**
- * The indexes are built where activation cannot (after the demo import, after a back-office request when the product
- * index is missing) and never on a front request.
+ * The indexes are built where activation cannot (after the demo import, after a back-office request when an index is
+ * missing) and never on a front request.
  */
 final class IndexBootstrapListenerTest extends TestCase
 {
     public function testTheIndexesAreRebuiltAfterASuccessfulDemoImport(): void
     {
-        $this->listener(expectedBuilds: 1, productIndexExists: true)
+        $this->listener(fullBuilds: 1, catalogueRebuilds: 1)
             ->rebuildIndexesAfterDemoImport($this->consoleTerminate('thelia:demo:import', Command::SUCCESS));
     }
 
     public function testAFailedDemoImportBuildsNothing(): void
     {
-        $this->listener(expectedBuilds: 0, productIndexExists: true)
+        $this->listener()
             ->rebuildIndexesAfterDemoImport($this->consoleTerminate('thelia:demo:import', Command::FAILURE));
     }
 
     public function testAnotherCommandBuildsNothing(): void
     {
-        $this->listener(expectedBuilds: 0, productIndexExists: false)
+        $this->listener(customerIndexExists: false)
             ->rebuildIndexesAfterDemoImport($this->consoleTerminate('cache:clear', Command::SUCCESS));
     }
 
-    public function testABackOfficeRequestBuildsTheMissingIndexes(): void
+    public function testABackOfficeRequestBuildsEveryIndexWhenTheCustomerIndexIsMissing(): void
     {
-        $this->listener(expectedBuilds: 1, productIndexExists: false)
+        $this->listener(customerIndexExists: false, fullBuilds: 1)
             ->buildMissingIndexesAfterBackOfficeRequest($this->kernelTerminate('/admin/modules'));
     }
 
-    public function testABackOfficeRequestLeavesExistingIndexesAlone(): void
+    public function testABackOfficeRequestHandsAMissingCatalogueToTheQueueInsteadOfBuildingIt(): void
     {
-        $this->listener(expectedBuilds: 0, productIndexExists: true)
+        $this->listener(catalogueQueued: 1)
             ->buildMissingIndexesAfterBackOfficeRequest($this->kernelTerminate('/admin/modules'));
     }
 
     public function testAFrontRequestNeverBuildsTheIndexes(): void
     {
-        $this->listener(expectedBuilds: 0, productIndexExists: false)
+        $this->listener(customerIndexExists: false)
             ->buildMissingIndexesAfterBackOfficeRequest($this->kernelTerminate('/search'));
     }
 
-    private function listener(int $expectedBuilds, bool $productIndexExists): IndexBootstrapListener
+    private function listener(bool $customerIndexExists = true, int $fullBuilds = 0, int $catalogueQueued = 0, int $catalogueRebuilds = 0): IndexBootstrapListener
     {
         $indexationProvider = $this->createMock(IndexationProvider::class);
-        $indexationProvider->expects(self::exactly($expectedBuilds))->method('indexAll');
+        $indexationProvider->expects(self::exactly($fullBuilds))->method('indexAll');
 
         $tntSearchProvider = $this->createStub(TntSearchProvider::class);
-        $tntSearchProvider->method('hasIndexFile')->willReturnMap([['product', $productIndexExists]]);
+        $tntSearchProvider->method('hasIndexFile')->willReturnMap([['customer', $customerIndexExists]]);
 
-        return new IndexBootstrapListener($indexationProvider, $tntSearchProvider);
+        $catalogueReindexer = $this->createMock(CatalogueReindexer::class);
+        $catalogueReindexer->expects(self::exactly($catalogueQueued))->method('queueOnceWhenMissing');
+        $catalogueReindexer->expects(self::exactly($catalogueRebuilds))->method('rebuild');
+
+        return new IndexBootstrapListener($indexationProvider, $tntSearchProvider, $catalogueReindexer);
     }
 
     private function consoleTerminate(string $commandName, int $exitCode): ConsoleTerminateEvent

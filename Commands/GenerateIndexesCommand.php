@@ -1,17 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace TntSearch\Commands;
 
-use Exception;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Thelia\Command\ContainerAwareCommand;
+use TntSearch\Search\CatalogueReindexer;
 use TntSearch\Service\Provider\IndexationProvider;
-use TntSearch\TntSearch;
 
 class GenerateIndexesCommand extends ContainerAwareCommand
 {
-    public function __construct(protected IndexationProvider $indexationProvider)
+    public function __construct(protected IndexationProvider $indexationProvider, protected CatalogueReindexer $catalogueReindexer)
     {
         parent::__construct();
     }
@@ -29,10 +30,11 @@ class GenerateIndexesCommand extends ContainerAwareCommand
 
         try {
             $this->indexationProvider->indexAll($output);
-            return self::SUCCESS;
+            $this->catalogueReindexer->rebuild();
 
-        } catch (Exception $exception) {
-            $output->write('<error>' . $exception->getMessage() . '</error>');
+            return self::SUCCESS;
+        } catch (\Exception $exception) {
+            $output->write('<error>'.$exception->getMessage().'</error>');
         }
 
         return self::FAILURE;
